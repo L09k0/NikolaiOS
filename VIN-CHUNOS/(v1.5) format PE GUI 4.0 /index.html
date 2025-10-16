@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>⚡ ВИН-ЧУН ОС - Система обработки жалоб Роскомнадзора</title>
+    <style>
+        /* === ВИН-ЧУН СТИЛЬ === */
+        :root {
+            --win-chun-power: "MAXIMUM";
+            --complaint-processor: "ACTIVE";
+            --roskomnadzor-connection: "ESTABLISHED";
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: #0a0a2a;
+            color: #00ffff;
+            font-family: 'Courier New', monospace;
+            overflow: hidden;
+            height: 100vh;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(0, 100, 255, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(255, 0, 255, 0.3) 0%, transparent 50%),
+                linear-gradient(45deg, #00002a 25%, transparent 25%),
+                linear-gradient(-45deg, #00002a 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, #00002a 75%),
+                linear-gradient(-45deg, transparent 75%, #00002a 75%);
+            background-size: 100px 100px;
+            background-position: 0 0, 0 50px, 50px -50px, -50px 0px;
+        }
+
+        /* === ИНТЕРФЕЙС ВИН-ЧУН ОС === */
+        .win-chun-os {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 10, 40, 0.95);
+            border: 3px solid #00ffff;
+            box-shadow: 
+                inset 0 0 100px #00ffff,
+                0 0 100px #00ffff;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* === ЗАГРУЗОЧНЫЙ ЭКРАН === */
+        .os-boot {
+            padding: 20px;
+            height: 100%;
+            overflow-y: auto;
+            font-size: 1.1em;
+            line-height: 1.4;
+        }
+
+        .boot-line {
+            margin: 5px 0;
+            animation: boot-type 0.1s linear forwards;
+            opacity: 0;
+        }
+
+        @keyframes boot-type {
+            to { opacity: 1; }
+        }
+
+        /* === АССЕМБЛЕРНЫЙ ИНТЕРФЕЙС === */
+        .assembler-interface {
+            display: none;
+            height: 100%;
+            flex-direction: column;
+        }
+
+        #os-ready:checked ~ .win-chun-os .os-boot {
+            display: none;
+        }
+
+        #os-ready:checked ~ .win-chun-os .assembler-interface {
+            display: flex;
+        }
+
+        /* === ПАНЕЛЬ РЕГИСТРОВ ВИН-ЧУН === */
+        .win-chun-registers {
+            background: rgba(0, 30, 60, 0.9);
+            border-bottom: 2px solid #00ffff;
+            padding: 10px;
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 8px;
+            font-size: 0.9em;
+        }
+
+        .win-register {
+            background: rgba(0, 255, 255, 0.1);
+            border: 1px solid #00ffff;
+            padding: 5px;
+            border-radius: 3px;
+            text-align: center;
+        }
+
+        .reg-value {
+            color: #ffff00;
+            font-weight: bold;
+        }
+
+        /* === РЕДАКТОР АССЕМБЛЕРА === */
+        .asm-workspace {
+            flex: 1;
+            display: flex;
+            height: calc(100% - 120px);
+        }
+
+        .fasm-editor {
+            flex: 1;
+            background: rgba(0, 0, 30, 0.9);
+            border-right: 2px solid #00ffff;
+            padding: 20px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            line-height: 1.4;
+        }
+
+        .asm-line {
+            margin: 6px 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .line-addr {
+            color: #0088ff;
+            margin-right: 15px;
+            min-width: 40px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .asm-code {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #00ffff;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1em;
+            outline: none;
+            width: 100%;
+        }
+
+        /* === СИСТЕМНЫЕ УТИЛИТЫ === */
+        .system-tools {
+            width: 300px;
+            background: rgba(0, 20, 40, 0.95);
+            border-left: 2px solid #00ffff;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .tool-button {
+            background: linear-gradient(135deg, #0088ff, #00ffff);
+            color: #000;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .tool-button:hover {
+            background: linear-gradient(135deg, #00ffff, #0088ff);
+            transform: translateY(-2px);
+        }
+
+        /* === КОМПИЛЯТОР ФАСМ === */
+        .compiler-output {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #00ffff;
+            border-radius: 5px;
+            padding: 10px;
+            overflow-y: auto;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+
+        .compile-line {
+            margin: 5px 0;
+            animation: compile-fade 0.3s ease-in;
+        }
+
+        @keyframes compile-fade {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* === КОМАНДНАЯ СТРОЙКА ВИН-ЧУН === */
+        .win-chun-command {
+            background: rgba(0, 40, 80, 0.9);
+            border-top: 2px solid #00ffff;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .command-prompt {
+            color: #00ffff;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+
+        .command-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #00ffff;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1em;
+            outline: none;
+        }
+
+        /* === СТИЛИ АССЕМБЛЕРА === */
+        .fasm-directive {
+            color: #ff00ff;
+            font-weight: bold;
+        }
+
+        .fasm-instruction {
+            color: #00ffff;
+        }
+
+        .fasm-register {
+            color: #ffff00;
+        }
+
+        .fasm-memory {
+            color: #ff8800;
+        }
+
+        .fasm-comment {
+            color: #008800;
+            font-style: italic;
+        }
+
+        .fasm-label {
+            color: #00ff00;
+        }
+
+        /* === АНИМАЦИИ ВИН-ЧУН === */
+        .execution-flow {
+            background: rgba(0, 255, 255, 0.2);
+            animation: win-chun-flow 2s infinite;
+        }
+
+        @keyframes win-chun-flow {
+            0%, 100% { background: rgba(0, 255, 255, 0.2); }
+            50% { background: rgba(0, 255, 255, 0.4); }
+        }
+
+        /* === СИСТЕМНЫЕ УВЕДОМЛЕНИЯ === */
+        .win-alert {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: linear-gradient(135deg, #0088ff, #00ffff);
+            color: #000;
+            padding: 15px;
+            border-radius: 5px;
+            display: none;
+            font-weight: bold;
+            z-index: 1000;
+            animation: win-pulse 1s infinite;
+        }
+
+        @keyframes win-pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+    </style>
+</head>
+<body>
+    <!-- СИСТЕМНЫЕ ФЛАГИ -->
+    <input type="checkbox" id="os-ready">
+    <input type="checkbox" id="complaint-compiled">
+    <input type="checkbox" id="roskomnadzor-connected">
+    <input type="checkbox" id="serb-targeted">
+
+    <!-- ОС ВИН-ЧУН -->
+    <div class="win-chun-os">
+        <!-- ЗАГРУЗОЧНЫЙ ЭКРАН -->
+        <div class="os-boot" id="bootScreen">
+            <div class="boot-line">⚡ ВИН-ЧУН ОПЕРАЦИОННАЯ СИСТЕМА v2.0</div>
+            <div class="boot-line">🎯 СИСТЕМА ОБРАБОТКИ ЖАЛОБ РОСКОМНАДЗОРА</div>
+            <div class="boot-line">👤 ПОЛЬЗОВАТЕЛЬ: НИКОЛАЙ ДИДЫК</div>
+            <div class="boot-line"> </div>
+            <div class="boot-line">💾 ИНИЦИАЛИЗАЦИЯ ПРОЦЕССОРА ВИН-ЧУН...</div>
+            <div class="boot-line">🔧 ЗАГРУЗКА КОМПИЛЯТОРА FASM...</div>
+            <div class="boot-line">📡 ПОДКЛЮЧЕНИЕ К РОСКОМНАДЗОРУ...</div>
+            <div class="boot-line">🎯 ИНИЦИАЛИЗАЦИЯ СИСТЕМЫ ПОИСКА СЕРБА...</div>
+            <div class="boot-line">⚡ КОМПИЛЯЦИЯ БОЕВЫХ ПРОТОКОЛОВ...</div>
+            <div class="boot-line">💻 СИСТЕМА ГОТОВА К РАБОТЕ</div>
+        </div>
+
+        <!-- АССЕМБЛЕРНЫЙ ИНТЕРФЕЙС -->
+        <div class="assembler-interface">
+            <!-- ПАНЕЛЬ РЕГИСТРОВ -->
+            <div class="win-chun-registers">
+                <div class="win-register">WIN_EAX: <span class="reg-value" id="regWIN_EAX">0x00000000</span></div>
+                <div class="win-register">WIN_EBX: <span class="reg-value" id="regWIN_EBX">0x00000000</span></div>
+                <div class="win-register">WIN_ECX: <span class="reg-value" id="regWIN_ECX">0x00000000</span></div>
+                <div class="win-register">WIN_EDX: <span class="reg-value" id="regWIN_EDX">0x00000000</span></div>
+                <div class="win-register">WIN_ESI: <span class="reg-value" id="regWIN_ESI">0x00000000</span></div>
+                <div class="win-register">WIN_EDI: <span class="reg-value" id="regWIN_EDI">0x00000000</span></div>
+                <div class="win-register">RKN_FLAGS: <span class="reg-value" id="regRKN_FLAGS">0x00000000</span></div>
+                <div class="win-register">SERB_PTR: <span class="reg-value" id="regSERB_PTR">0x00000000</span></div>
+                <div class="win-register">COMPLAINT_ID: <span class="reg-value" id="regCOMPLAINT_ID">0x00000000</span></div>
+                <div class="win-register">WIN_CHUN_PWR: <span class="reg-value" id="regWIN_CHUN_PWR">0x00000000</span></div>
+                <div class="win-register">TARGET_STATUS: <span class="reg-value" id="regTARGET_STATUS">0x00000000</span></div>
+                <div class="win-register">SYSTEM_MODE: <span class="reg-value" id="regSYSTEM_MODE">0x00000000</span></div>
+            </div>
+
+            <!-- РАБОЧАЯ ОБЛАСТЬ -->
+            <div class="asm-workspace">
+                <!-- РЕДАКТОР FASM -->
+                <div class="fasm-editor" id="fasmEditor">
+                    <div class="asm-line" id="line1">
+                        <span class="line-addr">0x00401000</span>
+                        <span class="fasm-directive">format</span> PE GUI 4.0
+                    </div>
+                    <div class="asm-line" id="line2">
+                        <span class="line-addr">0x00401010</span>
+                        <span class="fasm-directive">entry</span> start
+                    </div>
+                    <div class="asm-line" id="line3">
+                        <span class="line-addr">0x00401020</span>
+                        <span class="fasm-comment">; ⚡ СИСТЕМА ВИН-ЧУН - ОБРАБОТКА ЖАЛОБ РОСКОМНАДЗОРА</span>
+                    </div>
+                    <div class="asm-line" id="line4">
+                        <span class="line-addr">0x00401030</span>
+                        <span class="fasm-comment">; 👤 АВТОР: НИКОЛАЙ ДИДЫК</span>
+                    </div>
+                    <div class="asm-line" id="line5">
+                        <span class="line-addr">0x00401040</span>
+                        <span class="fasm-comment">; 🎯 ЦЕЛЬ: СЕРБ - ЛИКВИДАЦИЯ</span>
+                    </div>
+                    <div class="asm-line" id="line6">
+                        <span class="line-addr">0x00401050</span>
+                    </div>
+                    <div class="asm-line" id="line7">
+                        <span class="line-addr">0x00401060</span>
+                        <span class="fasm-directive">section</span> '.code' code readable executable
+                    </div>
+                    <div class="asm-line" id="line8">
+                        <span class="line-addr">0x00401070</span>
+                    </div>
+                    <div class="asm-line" id="line9">
+                        <span class="line-addr">0x00401080</span>
+                        <span class="fasm-label">start:</span>
+                    </div>
+                    <div class="asm-line" id="line10">
+                        <span class="line-addr">0x00401090</span>
+                        <span class="fasm-comment">; 🥋 ИНИЦИАЛИЗАЦИЯ ВИН-ЧУН</span>
+                    </div>
+                    <div class="asm-line" id="line11">
+                        <span class="line-addr">0x004010A0</span>
+                        <span class="fasm-instruction">mov</span> <span class="fasm-register">WIN_EAX</span>, <span class="fasm-memory">0xWINCHUN</span>
+                    </div>
+                    <div class="asm-line" id="line12">
+                        <span class="line-addr">0x004010B0</span>
+                        <span class="fasm-instruction">mov</span> <span class="fasm-register">WIN_CHUN_PWR</span>, <span class="fasm-memory">0xFFFFFFFF</span>
+                    </div>
+                    <div class="asm-line" id="line13">
+                        <span class="line-addr">0x004010C0</span>
+                        <span class="fasm-comment">; 📡 ПОДКЛЮЧЕНИЕ К РОСКОМНАДЗОРУ</span>
+                    </div>
+                    <div class="asm-line" id="line14">
+                        <span class="line-addr">0x004010D0</span>
+                        <span class="fasm-instruction">call</span> <span class="fasm-label">connect_roskomnadzor</span>
+                    </div>
+                    <div class="asm-line" id="line15">
+                        <span class="line-addr">0x004010E0</span>
+                        <span class="fasm-comment">; 🎯 ПОИСК СЕРБА</span>
+                    </div>
+                    <div class="asm-line" id="line16">
+                        <span class="line-addr">0x004010F0</span>
+                        <span class="fasm-instruction">call</span> <span class="fasm-label">find_serb_target</span>
+                    </div>
+                    <div class="asm-line" id="line17">
+                        <span class="line-addr">0x00401100</span>
+                        <span class="fasm-instruction">cmp</span> <span class="fasm-register">SERB_PTR</span>, <span class="fasm-memory">0</span>
+                    </div>
+                    <div class="asm-line" id="line18">
+                        <span class="line-addr">0x00401110</span>
+                        <span class="fasm-instruction">je</span> <span class="fasm-label">target_not_found</span>
+                    </div>
+                    <div class="asm-line" id="line19">
+                        <span class="line-addr">0x00401120</span>
+                        <span class="fasm-comment">; 📝 ФОРМИРОВАНИЕ ЖАЛОБЫ</span>
+                    </div>
+                    <div class="asm-line" id="line20">
+                        <span class="line-addr">0x00401130</span>
+                        <span class="fasm-instruction">call</span> <span class="fasm-label">generate_complaint</span>
+                    </div>
+                    <div class="asm-line" id="line21">
+                        <span class="line-addr">0x00401140</span>
+                        <span class="fasm-comment">; 🚀 ОТПРАВКА В РОСКОМНАДЗОР</span>
+                    </div>
+                    <div class="asm-line" id="line22">
+                        <span class="line-addr">0x00401150</span>
+                        <span class="fasm-instruction">call</span> <span class="fasm-label">send_to_roskomnadzor</span>
+                    </div>
+                    <div class="asm-line" id="line23">
+                        <span class="line-addr">0x00401160</span>
+                        <span class="fasm-comment">; ⚡ АКТИВАЦИЯ ВИН-ЧУН АТАКИ</span>
+                    </div>
+                    <div class="asm-line" id="line24">
+                        <span class="line-addr">0x00401170</span>
+                        <span class="fasm-instruction">call</span> <span class="fasm-label">win_chun_attack</span>
+                    </div>
+                    <div class="asm-line" id="line25">
+                        <span class="line-addr">0x00401180</span>
+                        <span class="fasm-label">mission_complete:</span>
+                    </div>
+                    <div class="asm-line" id="line26">
+                        <span class="line-addr">0x00401190</span>
+                        <span class="fasm-instruction">mov</span> <span class="fasm-register">WIN_EAX</span>, <span class="fasm-memory">1</span>
+                    </div>
+                    <div class="asm-line" id="line27">
+                        <span class="line-addr">0x004011A0</span>
+                        <span class="fasm-instruction">ret</span>
+                    </div>
+                </div>
+
+                <!-- СИСТЕМНЫЕ УТИЛИТЫ -->
+                <div class="system-tools">
+                    <button class="tool-button" onclick="compileFasm()">🔧 КОМПИЛИРОВАТЬ FASM</button>
+                    <button class="tool-button" onclick="executeProgram()">⚡ ВЫПОЛНИТЬ</button>
+                    <button class="tool-button" onclick="debugSystem()">🐛 ОТЛАДКА</button>
+                    <button class="tool-button" onclick="connectRoskomnadzor()">📡 ПОДКЛЮЧИТЬ РКН</button>
+                    <button class="tool-button" onclick="findSerb()">🎯 НАЙТИ СЕРБА</button>
+                    <button class="tool-button" onclick="sendComplaint()">📝 ОТПРАВИТЬ ЖАЛОБУ</button>
+                    
+                    <div class="compiler-output" id="compilerOutput">
+                        <div class="compile-line">⚡ FASM КОМПИЛЯТОР АКТИВЕН</div>
+                        <div class="compile-line">🎯 ЦЕЛЬ: ОБРАБОТКА ЖАЛОБ РОСКОМНАДЗОРА</div>
+                        <div class="compile-line">👤 АВТОР: НИКОЛАЙ ДИДЫК</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- КОМАНДНАЯ СТРОКА -->
+            <div class="win-chun-command">
+                <span class="command-prompt">winchun@roskomnadzor-os:~#</span>
+                <input type="text" class="command-input" id="commandInput" placeholder="Введите команду ВИН-ЧУН...">
+            </div>
+        </div>
+    </div>
+
+    <!-- СИСТЕМНЫЕ УВЕДОМЛЕНИЯ -->
+    <div class="win-alert" id="winAlert">
+        ⚡ ВИН-ЧУН СИСТЕМА АКТИВИРОВАНА
+    </div>
+
+    <script>
+        // Инициализация ОС ВИН-ЧУН
+        setTimeout(() => {
+            document.getElementById('os-ready').checked = true;
+            showWinAlert('⚡ ВИН-ЧУН ОС ЗАГРУЖЕНА');
+            
+            // Анимация загрузки
+            const bootLines = document.querySelectorAll('.boot-line');
+            bootLines.forEach((line, index) => {
+                line.style.animationDelay = (index * 0.3) + 's';
+            });
+        }, 3000);
+
+        // Система команд
+        const commandInput = document.getElementById('commandInput');
+        const compilerOutput = document.getElementById('compilerOutput');
+        const winAlert = document.getElementById('winAlert');
+
+        commandInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const command = this.value.trim().toLowerCase();
+                this.value = '';
+                
+                addCompilerLine(`<span style="color: #00ffff">winchun@roskomnadzor-os:~# ${command}</span>`);
+                processWinChunCommand(command);
+                
+                compilerOutput.scrollTop = compilerOutput.scrollHeight;
+            }
+        });
+
+        function processWinChunCommand(command) {
+            switch(command) {
+                case 'compile':
+                    compileFasm();
+                    break;
+                case 'execute':
+                    executeProgram();
+                    break;
+                case 'debug':
+                    debugSystem();
+                    break;
+                case 'connect_rkn':
+                    connectRoskomnadzor();
+                    break;
+                case 'find_serb':
+                    findSerb();
+                    break;
+                case 'send_complaint':
+                    sendComplaint();
+                    break;
+                case 'win_chun_power':
+                    activateWinChun();
+                    break;
+                case 'status':
+                    showStatus();
+                    break;
+                case 'help':
+                    showHelp();
+                    break;
+                default:
+                    addCompilerLine(`<span style="color: #ff0000">ОШИБКА: Неизвестная команда '${command}'</span>`);
+            }
+        }
+
+        function compileFasm() {
+            addCompilerLine('<span style="color: #ffff00">🔧 КОМПИЛЯЦИЯ FASM КОДА...</span>');
+            
+            setTimeout(() => {
+                addCompilerLine('<span style="color: #00ff00">✅ КОД УСПЕШНО СКОМПИЛИРОВАН</span>');
+                addCompilerLine('<span style="color: #00ff00">📦 Размер: 4 КБ</span>');
+                addCompilerLine('<span style="color: #00ff00">🎯 Цель: Серб - в процессе ликвидации</span>');
+                document.getElementById('complaint-compiled').checked = true;
+                showWinAlert('✅ FASM КОМПИЛЯЦИЯ УСПЕШНА');
+            }, 2000);
+        }
+
+        function executeProgram() {
+            if (!document.getElementById('complaint-compiled').checked) {
+                addCompilerLine('<span style="color: #ff0000">❌ СНАЧАЛА СКОМПИЛИРУЙТЕ КОД!</span>');
+                return;
+            }
+
+            addCompilerLine('<span style="color: #ff00ff">⚡ ВЫПОЛНЕНИЕ ПРОГРАММЫ ВИН-ЧУН...</span>');
+            
+            // Последовательное выполнение
+            executeWinChunStepByStep();
+        }
+
+        function executeWinChunStepByStep() {
+            const lines = document.querySelectorAll('.asm-line');
+            let currentLine = 0;
+            
+            function executeNextLine() {
+                if (currentLine < lines.length) {
+                    // Убираем выделение
+                    lines.forEach(line => line.classList.remove('execution-flow'));
+                    
+                    // Выделяем текущую строку
+                    lines[currentLine].classList.add('execution-flow');
+                    
+                    // Обрабатываем инструкцию
+                    processWinChunInstruction(currentLine);
+                    
+                    currentLine++;
+                    setTimeout(executeNextLine, 800);
+                } else {
+                    addCompilerLine('<span style="color: #00ff00">🎉 ПРОГРАММА ВЫПОЛНЕНА! СЕРБ ЛИКВИДИРОВАН!</span>');
+                    showWinAlert('🎯 МИССИЯ ВЫПОЛНЕНА!');
+                }
+            }
+            
+            executeNextLine();
+        }
+
+        function processWinChunInstruction(lineIndex) {
+            switch(lineIndex) {
+                case 10:
+                    addCompilerLine('<span style="color: #ffff00">🥋 ИНИЦИАЛИЗАЦИЯ ВИН-ЧУН...</span>');
+                    break;
+                case 11:
+                    updateRegister('WIN_EAX', '0xWINCHUN');
+                    break;
+                case 12:
+                    updateRegister('WIN_CHUN_PWR', '0xFFFFFFFF');
+                    addCompilerLine('<span style="color: #00ff00">⚡ СИЛА ВИН-ЧУН: МАКСИМУМ</span>');
+                    break;
+                case 14:
+                    addCompilerLine('<span style="color: #00ffff">📡 ПОДКЛЮЧЕНИЕ К РОСКОМНАДЗОРУ...</span>');
+                    setTimeout(() => {
+                        updateRegister('RKN_FLAGS', '0xCONNECTED');
+                        addCompilerLine('<span style="color: #00ff00">✅ ПОДКЛЮЧЕНИЕ УСТАНОВЛЕНО</span>');
+                    }, 500);
+                    break;
+                case 16:
+                    addCompilerLine('<span style="color: #ff8800">🎯 ПОИСК ЦЕЛИ СЕРБ...</span>');
+                    setTimeout(() => {
+                        updateRegister('SERB_PTR', '0xSERB001');
+                        updateRegister('TARGET_STATUS', '0xLOCKED');
+                        addCompilerLine('<span style="color: #00ff00">🎯 СЕРБ ОБНАРУЖЕН И ЗАБЛОКИРОВАН!</span>');
+                        document.getElementById('serb-targeted').checked = true;
+                    }, 1000);
+                    break;
+                case 20:
+                    addCompilerLine('<span style="color: #ff00ff">📝 ФОРМИРОВАНИЕ ЖАЛОБЫ...</span>');
+                    updateRegister('COMPLAINT_ID', '0xCOMP001');
+                    break;
+                case 22:
+                    addCompilerLine('<span style="color: #00aaff">🚀 ОТПРАВКА ЖАЛОБЫ В РОСКОМНАДЗОР...</span>');
+                    setTimeout(() => {
+                        addCompilerLine('<span style="color: #00ff00">✅ ЖАЛОБА УСПЕШНО ОТПРАВЛЕНА!</span>');
+                    }, 800);
+                    break;
+                case 24:
+                    addCompilerLine('<span style="color: #ff0000">⚡ АКТИВАЦИЯ ВИН-ЧУН АТАКИ!</span>');
+                    setTimeout(() => {
+                        updateRegister('TARGET_STATUS', '0xTERMINATED');
+                        addCompilerLine('<span style="color: #00ff00">🎯 СЕРБ ЛИКВИДИРОВАН СИЛОЙ ВИН-ЧУН!</span>');
+                    }, 1000);
+                    break;
+            }
+        }
+
+        function updateRegister(regName, value) {
+            const regElement = document.getElementById('reg' + regName);
+            if (regElement) {
+                regElement.textContent = value;
+                regElement.style.animation = 'register-pulse 0.5s ease-in-out';
+                setTimeout(() => {
+                    regElement.style.animation = '';
+                }, 500);
+            }
+        }
+
+        function connectRoskomnadzor() {
+            addCompilerLine('<span style="color: #00ffff">📡 УСТАНОВКА СОЕДИНЕНИЯ С РОСКОМНАДЗОРОМ...</span>');
+            setTimeout(() => {
+                updateRegister('RKN_FLAGS', '0xCONNECTED');
+                document.getElementById('roskomnadzor-connected').checked = true;
+                addCompilerLine('<span style="color: #00ff00">✅ СОЕДИНЕНИЕ С РКН УСТАНОВЛЕНО</span>');
+                showWinAlert('📡 ПОДКЛЮЧЕНО К РОСКОМНАДЗОРУ');
+            }, 1500);
+        }
+
+        function findSerb() {
+            addCompilerLine('<span style="color: #ff8800">🎯 ЗАПУСК ПОИСКА СЕРБА...</span>');
+            setTimeout(() => {
+                updateRegister('SERB_PTR', '0xSERB001');
+                updateRegister('TARGET_STATUS', '0xLOCKED');
+                document.getElementById('serb-targeted').checked = true;
+                addCompilerLine('<span style="color: #00ff00">🎯 СЕРБ ОБНАРУЖЕН! КООРДИНАТЫ: 55.7558°N, 37.6173°E</span>');
+                showWinAlert('🎯 ЦЕЛЬ ОБНАРУЖЕНА');
+            }, 2000);
+        }
+
+        function sendComplaint() {
+            if (!document.getElementById('roskomnadzor-connected').checked) {
+                addCompilerLine('<span style="color: #ff0000">❌ НЕТ ПОДКЛЮЧЕНИЯ К РОСКОМНАДЗОРУ!</span>');
+                return;
+            }
+
+            addCompilerLine('<span style="color: #00aaff">📝 ОТПРАВКА ЖАЛОБЫ В РОСКОМНАДЗОР...</span>');
+            setTimeout(() => {
+                updateRegister('COMPLAINT_ID', '0xCOMP001');
+                addCompilerLine('<span style="color: #00ff00">✅ ЖАЛОБА №COMP001 УСПЕШНО ОТПРАВЛЕНА!</span>');
+                addCompilerLine('<span style="color: #ffff00">ТЕКСТ ЖАЛОБЫ: "Серб - ублюдок! Николай Дидык найдет и уничтожит!"</span>');
+                showWinAlert('📝 ЖАЛОБА ОТПРАВЛЕНА');
+            }, 1500);
+        }
+
+        function activateWinChun() {
+            addCompilerLine('<span style="color: #ff00ff">🥋 АКТИВАЦИЯ СИЛЫ ВИН-ЧУН...</span>');
+            updateRegister('WIN_CHUN_PWR', '0xFFFFFFFF');
+            addCompilerLine('<span style="color: #00ff00">⚡ ЭНЕРГИЯ ВИН-ЧУН: 1000%</span>');
+            showWinAlert('🥋 ВИН-ЧУН АКТИВИРОВАН');
+        }
+
+        function debugSystem() {
+            addCompilerLine('<span style="color: #ff00ff">🐛 ЗАПУСК СИСТЕМЫ ОТЛАДКИ...</span>');
+            addCompilerLine('<span style="color: #ff00ff">📊 СТАТУС РЕГИСТРОВ:</span>');
+            addCompilerLine('<span style="color: #ff00ff">WIN_EAX: 0xWINCHUN</span>');
+            addCompilerLine('<span style="color: #ff00ff">WIN_CHUN_PWR: 0xFFFFFFFF</span>');
+            addCompilerLine('<span style="color: #ff00ff">SERB_PTR: 0xSERB001</span>');
+            addCompilerLine('<span style="color: #ff00ff">RKN_FLAGS: 0xCONNECTED</span>');
+        }
+
+        function showStatus() {
+            addCompilerLine('<span style="color: #00ffff">📊 СТАТУС СИСТЕМЫ ВИН-ЧУН:</span>');
+            addCompilerLine('<span style="color: #00ffff">• Компиляция: ' + (document.getElementById('complaint-compiled').checked ? '✅' : '❌') + '</span>');
+            addCompilerLine('<span style="color: #00ffff">• Роскомнадзор: ' + (document.getElementById('roskomnadzor-connected').checked ? '✅' : '❌') + '</span>');
+            addCompilerLine('<span style="color: #00ffff">• Цель Серб: ' + (document.getElementById('serb-targeted').checked ? '✅' : '❌') + '</span>');
+            addCompilerLine('<span style="color: #00ffff">• Сила ВИН-ЧУН: ' + (document.getElementById('regWIN_CHUN_PWR').textContent === '0xFFFFFFFF' ? '1000%' : '0%') + '</span>');
+        }
+
+        function showHelp() {
+            addCompilerLine('<span style="color: #00ffff">📖 КОМАНДЫ ВИН-ЧУН ОС:</span>');
+            addCompilerLine('<span style="color: #00ffff">compile - Компиляция FASM кода</span>');
+            addCompilerLine('<span style="color: #00ffff">execute - Выполнение программы</span>');
+            addCompilerLine('<span style="color: #00ffff">debug - Режим отладки</span>');
+            addCompilerLine('<span style="color: #00ffff">connect_rkn - Подключение к Роскомнадзору</span>');
+            addCompilerLine('<span style="color: #00ffff">find_serb - Поиск цели Серб</span>');
+            addCompilerLine('<span style="color: #00ffff">send_complaint - Отправка жалобы</span>');
+            addCompilerLine('<span style="color: #00ffff">win_chun_power - Активация ВИН-ЧУН</span>');
+            addCompilerLine('<span style="color: #00ffff">status - Статус системы</span>');
+            addCompilerLine('<span style="color: #00ffff">help - Справка</span>');
+        }
+
+        function addCompilerLine(html) {
+            const line = document.createElement('div');
+            line.className = 'compile-line';
+            line.innerHTML = html;
+            compilerOutput.appendChild(line);
+            compilerOutput.scrollTop = compilerOutput.scrollHeight;
+        }
+
+        function showWinAlert(message) {
+            winAlert.textContent = message;
+            winAlert.style.display = 'block';
+            setTimeout(() => {
+                winAlert.style.display = 'none';
+            }, 3000);
+        }
+
+        // Автофокус
+        setTimeout(() => {
+            commandInput.focus();
+        }, 3500);
+
+        // Анимация для регистров
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes register-pulse {
+                0% { color: #ffff00; transform: scale(1); }
+                50% { color: #ff8800; transform: scale(1.1); }
+                100% { color: #ffff00; transform: scale(1); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

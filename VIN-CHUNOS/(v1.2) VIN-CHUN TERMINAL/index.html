@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>⚡ ВУН-ЧУН ТЕРМИНАЛ - Система Николая Дидыка</title>
+    <style>
+        /* === АБСОЛЮТНАЯ КОНФИГУРАЦИЯ ВУН-ЧУН === */
+        :root {
+            --terminal-power: "INFINITE";
+            --dynamic-level: "MAXIMUM_OVERDRIVE";
+            --serb-destiny: "TERMINATED";
+        }
+
+        /* === ВУН-ЧУН ЭНЕРГЕТИЧЕСКОЕ ПОЛЕ === */
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            overflow: hidden;
+            height: 100vh;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(255, 107, 0, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(0, 255, 0, 0.1) 0%, transparent 50%),
+                linear-gradient(45deg, #000 25%, transparent 25%),
+                linear-gradient(-45deg, #000 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, #000 75%),
+                linear-gradient(-45deg, transparent 75%, #000 75%);
+            background-size: 100px 100px;
+            background-position: 0 0, 0 50px, 50px -50px, -50px 0px;
+        }
+
+        /* === СОВЕРШЕННЫЙ ТЕРМИНАЛ === */
+        .wun-chun-terminal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            border: 3px solid #00ff00;
+            box-shadow: 
+                inset 0 0 100px #00ff00,
+                0 0 100px #00ff00;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* === ЗАГРУЗОЧНЫЙ ЭКРАН ТЕРМИНАЛА === */
+        .terminal-boot {
+            padding: 20px;
+            height: 100%;
+            overflow-y: auto;
+            font-size: 1.1em;
+            line-height: 1.4;
+        }
+
+        .boot-line {
+            margin: 5px 0;
+            animation: typewriter 0.1s linear forwards;
+            opacity: 0;
+        }
+
+        @keyframes typewriter {
+            to { opacity: 1; }
+        }
+
+        /* === ДИНАМИЧЕСКИЙ ИНТЕРФЕЙС === */
+        .terminal-interface {
+            display: none;
+            height: 100%;
+            flex-direction: column;
+        }
+
+        #terminal-ready:checked ~ .wun-chun-terminal .terminal-boot {
+            display: none;
+        }
+
+        #terminal-ready:checked ~ .wun-chun-terminal .terminal-interface {
+            display: flex;
+        }
+
+        /* === КОМАНДНАЯ СТРОКА === */
+        .command-line {
+            background: rgba(0, 255, 0, 0.1);
+            border-top: 2px solid #00ff00;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .prompt {
+            color: #00ff00;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+
+        .command-input {
+            background: transparent;
+            border: none;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1em;
+            width: 100%;
+            outline: none;
+        }
+
+        /* === ВЫВОД ТЕРМИНАЛА === */
+        .terminal-output {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            font-size: 1.1em;
+        }
+
+        .output-line {
+            margin: 8px 0;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* === СИСТЕМНЫЕ КОМАНДЫ === */
+        .command-sudo {
+            color: #ff0000;
+            font-weight: bold;
+        }
+
+        .command-success {
+            color: #00ff00;
+        }
+
+        .command-warning {
+            color: #ffff00;
+        }
+
+        .command-error {
+            color: #ff0000;
+        }
+
+        /* === ДИНАМИЧЕСКИЕ ЭФФЕКТЫ === */
+        .dynamic-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .chi-particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #00ff00;
+            border-radius: 50%;
+            animation: chi-flow 3s linear infinite;
+        }
+
+        @keyframes chi-flow {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* === СИСТЕМНЫЕ УВЕДОМЛЕНИЯ === */
+        .system-alert {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 0, 0, 0.9);
+            color: white;
+            padding: 15px;
+            border: 2px solid #ff0000;
+            border-radius: 5px;
+            display: none;
+            font-weight: bold;
+            z-index: 1000;
+            animation: alert-pulse 1s infinite;
+        }
+
+        @keyframes alert-pulse {
+            0%, 100% { box-shadow: 0 0 20px rgba(255, 0, 0, 0.7); }
+            50% { box-shadow: 0 0 40px rgba(255, 0, 0, 0.9); }
+        }
+
+        /* === АНИМАЦИИ ВВОДА === */
+        .typing-animation::after {
+            content: '|';
+            animation: cursor-blink 1s infinite;
+        }
+
+        @keyframes cursor-blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <!-- СИСТЕМНЫЕ ФЛАГИ -->
+    <input type="checkbox" id="terminal-ready">
+    <input type="checkbox" id="serb-terminated">
+    <input type="checkbox" id="yuki-activated">
+
+    <!-- СОВЕРШЕННЫЙ ТЕРМИНАЛ -->
+    <div class="wun-chun-terminal">
+        <!-- ЗАГРУЗОЧНЫЙ ЭКРАН -->
+        <div class="terminal-boot" id="boot-screen">
+            <div class="boot-line">⚡ ИНИЦИАЛИЗАЦИЯ ВУН-ЧУН ТЕРМИНАЛА...</div>
+            <div class="boot-line">🎯 ЗАГРУЗКА СИСТЕМЫ НИКОЛАЯ ДИДЫКА...</div>
+            <div class="boot-line">🥋 АКТИВАЦИЯ БОЕВЫХ ПРОТОКОЛОВ...</div>
+            <div class="boot-line">📡 ПОДКЛЮЧЕНИЕ К ВСЕМ СЕТЯМ...</div>
+            <div class="boot-line">🛰️ ЗАХВАТ СПУТНИКОВЫХ КАНАЛОВ...</div>
+            <div class="boot-line">💥 ИНИЦИАЛИЗАЦИЯ СИЛЫ ЦИ...</div>
+            <div class="boot-line">🔪 ПОДГОТОВКА К ЛИКВИДАЦИИ СЕРБА...</div>
+            <div class="boot-line">⚡ СИСТЕМА ГОТОВА К УПРАВЛЕНИЮ...</div>
+        </div>
+
+        <!-- ОСНОВНОЙ ИНТЕРФЕС -->
+        <div class="terminal-interface">
+            <!-- ВЫВОД ТЕРМИНАЛА -->
+            <div class="terminal-output" id="output">
+                <div class="output-line command-success">╔═══════════════════════════════════════╗</div>
+                <div class="output-line command-success">║ ⚡ ВУН-ЧУН ТЕРМИНАЛ v2.0 ║</div>
+                <div class="output-line command-success">║ 🎯 СИСТЕМА НИКОЛАЯ ДИДЫКА ║</div>
+                <div class="output-line command-success">║ 🔪 ЦЕЛЬ: СЕРБ - ЛИКВИДАЦИЯ ║</div>
+                <div class="output-line command-success">╚═══════════════════════════════════════╝</div>
+                <div class="output-line"> </div>
+                <div class="output-line">ДОСТУПНЫЕ КОМАНДЫ:</div>
+                <div class="output-line">• <span class="command-sudo">find_serb</span> - начать поиск Серба</div>
+                <div class="output-line">• <span class="command-sudo">activate_wun_chun</span> - активировать силу Вун-Чун</div>
+                <div class="output-line">• <span class="command-sudo">arma2_tactical</span> - тактический режим ARMA 2</div>
+                <div class="output-line">• <span class="command-sudo">yuki_pose</span> - активация позы Юки Нагато</div>
+                <div class="output-line">• <span class="command-sudo">terminate_serb</span> - выполнить протокол ликвидации</div>
+                <div class="output-line">• <span class="command-sudo">max_dynamics</span> - максимальная динамика системы</div>
+                <div class="output-line"> </div>
+                <div class="output-line">Введите команду:</div>
+            </div>
+
+            <!-- КОМАНДНАЯ СТРОКА -->
+            <div class="command-line">
+                <span class="prompt">nikolay@wun-chun-terminal:~#</span>
+                <input type="text" class="command-input" id="commandInput" placeholder="Введите команду...">
+            </div>
+        </div>
+    </div>
+
+    <!-- ДИНАМИЧЕСКИЙ ФОН -->
+    <div class="dynamic-background" id="dynamicBg"></div>
+
+    <!-- СИСТЕМНЫЕ УВЕДОМЛЕНИЯ -->
+    <div class="system-alert" id="systemAlert">
+        ⚡ СИСТЕМНОЕ УВЕДОМЛЕНИЕ
+    </div>
+
+    <!-- СКРИПТЫ ТЕРМИНАЛА -->
+    <script>
+        // Создание частиц энергии Ци
+        function createChiParticles() {
+            const bg = document.getElementById('dynamicBg');
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'chi-particle';
+                particle.style.left = Math.random() * 100 + 'vw';
+                particle.style.animationDelay = Math.random() * 3 + 's';
+                particle.style.animationDuration = (2 + Math.random() * 2) + 's';
+                bg.appendChild(particle);
+            }
+        }
+
+        // Загрузка терминала
+        setTimeout(() => {
+            document.getElementById('terminal-ready').checked = true;
+            createChiParticles();
+        }, 3000);
+
+        // Анимация загрузки
+        const bootLines = document.querySelectorAll('.boot-line');
+        bootLines.forEach((line, index) => {
+            line.style.animationDelay = (index * 0.5) + 's';
+        });
+
+        // Система команд терминала
+        const commandInput = document.getElementById('commandInput');
+        const output = document.getElementById('output');
+        const systemAlert = document.getElementById('systemAlert');
+
+        commandInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const command = this.value.trim().toLowerCase();
+                this.value = '';
+                
+                // Добавляем ввод пользователя в вывод
+                const userInput = document.createElement('div');
+                userInput.className = 'output-line';
+                userInput.innerHTML = `<span class="prompt">nikolay@wun-chun-terminal:~#</span> ${command}`;
+                output.appendChild(userInput);
+
+                // Обработка команд
+                processCommand(command);
+                
+                // Прокрутка вниз
+                output.scrollTop = output.scrollHeight;
+            }
+        });
+
+        function processCommand(command) {
+            let response = '';
+            
+            switch(command) {
+                case 'find_serb':
+                    response = `<span class="command-success">🎯 АКТИВИРОВАН ВСЕМИРНЫЙ ПОИСК СЕРБА...</span>`;
+                    setTimeout(() => {
+                        addOutputLine(`<span class="command-success">🛰️ СЕРБ ОБНАРУЖЕН: КООРДИНАТЫ 55.7558°N, 37.6173°E</span>`);
+                        showAlert('🎯 ЦЕЛЬ ОБНАРУЖЕНА!');
+                    }, 2000);
+                    break;
+                    
+                case 'activate_wun_chun':
+                    response = `<span class="command-warning">🥋 АКТИВАЦИЯ СИЛЫ ВУН-ЧУН...</span>`;
+                    setTimeout(() => {
+                        addOutputLine(`<span class="command-success">⚡ ЭНЕРГИЯ ЦИ: 1000%</span>`);
+                        addOutputLine(`<span class="command-success">💥 БОЕВАЯ ГОТОВНОСТЬ: МАКСИМУМ</span>`);
+                        showAlert('⚡ ВУН-ЧУН АКТИВИРОВАН!');
+                        increaseDynamics();
+                    }, 1500);
+                    break;
+                    
+                case 'arma2_tactical':
+                    response = `<span class="command-warning">🎮 АКТИВАЦИЯ ТАКТИЧЕСКОГО РЕЖИМА ARMA 2...</span>`;
+                    setTimeout(() => {
+                        addOutputLine(`<span class="command-success">📡 ТАКТИЧЕСКАЯ СЕТЬ: АКТИВНА</span>`);
+                        addOutputLine(`<span class="command-success">🎯 СТРАТЕГИЧЕСКИЕ ЦЕЛИ: ОПРЕДЕЛЕНЫ</span>`);
+                        showAlert('🎮 ARMA 2 ТАКТИКА АКТИВИРОВАНА!');
+                    }, 1500);
+                    break;
+                    
+                case 'yuki_pose':
+                    response = `<span class="command-warning">🌀 АКТИВАЦИЯ ПОЗЫ ЮКИ НАГАТО...</span>`;
+                    setTimeout(() => {
+                        addOutputLine(`<span class="command-success">✨ ПОЗА ШПАГАТА: АКТИВИРОВАНА</span>`);
+                        addOutputLine(`<span class="command-success">🌟 ЭНЕРГЕТИЧЕСКИЙ ПОТОК: МАКСИМАЛЬНЫЙ</span>`);
+                        document.getElementById('yuki-activated').checked = true;
+                        showAlert('🌀 ЮКИ НАГАТО АКТИВИРОВАН!');
+                        maxDynamics();
+                    }, 1500);
+                    break;
+                    
+                case 'terminate_serb':
+                    response = `<span class="command-error">🔪 АКТИВАЦИЯ ПРОТОКОЛА ЛИКВИДАЦИИ СЕРБА...</span>`;
+                    setTimeout(() => {
+                        addOutputLine(`<span class="command-error">💀 СЕРБ: ЛИКВИДИРОВАН</span>`);
+                        addOutputLine(`<span class="command-success">🎯 МИССИЯ ВЫПОЛНЕНА: НИКОЛАЙ ДИДЫК ПОБЕДИЛ</span>`);
+                        document.getElementById('serb-terminated').checked = true;
+                        showAlert('💀 СЕРБ ЛИКВИДИРОВАН!');
+                        ultimateDynamics();
+                    }, 2000);
+                    break;
+                    
+                case 'max_dynamics':
+                    response = `<span class="command-sudo">⚡ АКТИВАЦИЯ МАКСИМАЛЬНОЙ ДИНАМИКИ...</span>`;
+                    maxDynamics();
+                    break;
+                    
+                case 'help':
+                    response = `<span class="command-success">ДОСТУПНЫЕ КОМАНДЫ: find_serb, activate_wun_chun, arma2_tactical, yuki_pose, terminate_serb, max_dynamics, help</span>`;
+                    break;
+                    
+                default:
+                    response = `<span class="command-error">❌ НЕИЗВЕСТНАЯ КОМАНДА: ${command}</span>`;
+                    response += `<br><span class="command-warning">Введите 'help' для списка команд</span>`;
+            }
+            
+            addOutputLine(response);
+        }
+
+        function addOutputLine(html) {
+            const line = document.createElement('div');
+            line.className = 'output-line';
+            line.innerHTML = html;
+            output.appendChild(line);
+            output.scrollTop = output.scrollHeight;
+        }
+
+        function showAlert(message) {
+            systemAlert.innerHTML = message;
+            systemAlert.style.display = 'block';
+            setTimeout(() => {
+                systemAlert.style.display = 'none';
+            }, 3000);
+        }
+
+        function increaseDynamics() {
+            document.body.style.animation = 'dynamic-pulse 0.5s infinite';
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes dynamic-pulse {
+                    0%, 100% { filter: hue-rotate(0deg); }
+                    50% { filter: hue-rotate(90deg); }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+
+        function maxDynamics() {
+            document.body.style.animation = 'max-dynamics 0.3s infinite';
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes max-dynamics {
+                    0% { filter: hue-rotate(0deg) brightness(1.5); }
+                    25% { filter: hue-rotate(90deg) brightness(1.7); }
+                    50% { filter: hue-rotate(180deg) brightness(2); }
+                    75% { filter: hue-rotate(270deg) brightness(1.7); }
+                    100% { filter: hue-rotate(360deg) brightness(1.5); }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+
+        function ultimateDynamics() {
+            document.body.style.animation = 'ultimate-dynamics 0.1s infinite';
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes ultimate-dynamics {
+                    0% { 
+                        filter: hue-rotate(0deg) brightness(2) contrast(2);
+                        transform: scale(1);
+                    }
+                    50% { 
+                        filter: hue-rotate(180deg) brightness(3) contrast(3);
+                        transform: scale(1.01);
+                    }
+                    100% { 
+                        filter: hue-rotate(360deg) brightness(2) contrast(2);
+                        transform: scale(1);
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            // Создаем дополнительные частицы
+            createChiParticles();
+            createChiParticles();
+        }
+
+        // Фокус на поле ввода при загрузке
+        setTimeout(() => {
+            commandInput.focus();
+        }, 3500);
+    </script>
+</body>
+</html>

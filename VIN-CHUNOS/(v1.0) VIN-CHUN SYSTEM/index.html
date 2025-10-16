@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-9">
+    <title>СИСТЕМА "ВУН-ЧУН" - Персональная ОС Николая Дидыка</title>
+    <style>
+        /* === КОНФИГУРАЦИЯ СИСТЕМЫ ПОД НИКОЛАЯ ДИДЫКА === */
+        :root {
+            --user-name: "Николай Дидык";
+            --user-title: "Мастер Вун-Чун | Стример ARMA 2 | Охотник на Серба";
+            --system-theme: "combat-mode";
+            --chi-energy: 100%;
+        }
+
+        /* === СТИЛЬ ВУН-ЧУН === */
+        body {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: #e0e0e0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+
+        /* === ЗАГРУЗЧИК В СТИЛЕ ВУН-ЧУН === */
+        .wun-chun-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #ffd700;
+            font-family: 'Courier New', monospace;
+        }
+
+        .wun-chun-loader::before {
+            content: "⚡ СИСТЕМА ВУН-ЧУН ⚡";
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            animation: chi-pulse 2s infinite;
+        }
+
+        .wun-chun-loader::after {
+            content: "Инициализация боевых протоколов...\AЗагрузка тактики охоты...\AАктивация режима стримера...\AПодготовка к встрече с Сербом...";
+            white-space: pre;
+            text-align: center;
+            line-height: 1.8;
+            animation: boot-sequence 4s forwards;
+        }
+
+        @keyframes chi-pulse {
+            0%, 100% { opacity: 1; text-shadow: 0 0 20px #ffd700; }
+            50% { opacity: 0.7; text-shadow: 0 0 30px #ff6b00; }
+        }
+
+        @keyframes boot-sequence {
+            100% {
+                content: "⚡ СИСТЕМА ГОТОВА ⚡\AПользователь: Николай Дидык\AСтатус: ОХОТА АКТИВИРОВАНА\AЦель: Серб\AЭнергия Ци: 100%";
+            }
+        }
+
+        /* === ИНТЕРФЕЙС СИСТЕМЫ === */
+        .combat-desktop {
+            display: none;
+            min-height: 100vh;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(255, 107, 0, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 215, 0, 0.1) 0%, transparent 50%),
+                linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+        }
+
+        #system-ready:checked ~ .wun-chun-loader {
+            display: none;
+        }
+
+        #system-ready:checked ~ .combat-desktop {
+            display: block;
+        }
+
+        /* === БОЕВАЯ ПАНЕЛЬ === */
+        .combat-panel {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+            padding: 20px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            backdrop-filter: blur(10px);
+        }
+
+        /* === СТАТУС НИКОЛАЯ === */
+        .user-status {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 107, 0, 0.2);
+            border: 2px solid #ff6b00;
+            border-radius: 10px;
+            padding: 15px;
+            backdrop-filter: blur(5px);
+        }
+
+        .user-status h2 {
+            margin: 0;
+            color: #ffd700;
+            font-size: 1.2em;
+        }
+
+        .user-status p {
+            margin: 5px 0;
+            font-size: 0.9em;
+        }
+
+        /* === СИСТЕМНЫЕ ПРИЛОЖЕНИЯ === */
+        .combat-app {
+            background: rgba(30, 30, 30, 0.95);
+            border: 2px solid #ff6b00;
+            border-radius: 15px;
+            margin: 20px;
+            box-shadow: 0 10px 30px rgba(255, 107, 0, 0.3);
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            max-width: 800px;
+        }
+
+        .app-header {
+            background: linear-gradient(135deg, #ff6b00, #ffd700);
+            color: black;
+            padding: 15px;
+            border-radius: 13px 13px 0 0;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .app-content {
+            padding: 25px;
+        }
+
+        /* === ПРИЛОЖЕНИЕ ОХОТЫ НА СЕРБА === */
+        #app-hunt:checked ~ .combat-desktop .hunt-app {
+            display: block;
+        }
+
+        .target-info {
+            background: rgba(255, 0, 0, 0.1);
+            border: 1px solid #ff4444;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        /* === СИСТЕМА ТРЕНИРОВОК ВУН-ЧУН === */
+        #app-training:checked ~ .combat-desktop .training-app {
+            display: block;
+        }
+
+        .chi-meter {
+            width: 100%;
+            height: 20px;
+            background: #333;
+            border-radius: 10px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+
+        .chi-energy {
+            height: 100%;
+            background: linear-gradient(90deg, #ffd700, #ff6b00);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        /* === СТРИМИНГ АРМА 2 === */
+        #app-stream:checked ~ .combat-desktop .stream-app {
+            display: block;
+        }
+
+        .stream-overlay {
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #00ff00;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+
+        /* === СИСТЕМНЫЕ КНОПКИ В СТИЛЕ ВУН-ЧУН === */
+        .combat-button {
+            background: linear-gradient(135deg, #ff6b00, #ffd700);
+            color: black;
+            border: none;
+            padding: 12px 24px;
+            margin: 8px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(255, 107, 0, 0.4);
+        }
+
+        .combat-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 107, 0, 0.6);
+        }
+
+        .combat-button.danger {
+            background: linear-gradient(135deg, #ff0000, #ff4444);
+            box-shadow: 0 5px 15px rgba(255, 0, 0, 0.4);
+        }
+
+        .combat-button.success {
+            background: linear-gradient(135deg, #00ff00, #44ff44);
+            box-shadow: 0 5px 15px rgba(0, 255, 0, 0.4);
+        }
+
+        /* === АНИМАЦИИ ВУН-ЧУН === */
+        @keyframes strike-animation {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .combat-action:active {
+            animation: strike-animation 0.2s ease;
+        }
+
+        /* === СИСТЕМНЫЕ УВЕДОМЛЕНИЯ === */
+        .combat-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #ff6b00, #ffd700);
+            color: black;
+            padding: 15px 25px;
+            border-radius: 10px;
+            display: none;
+            font-weight: bold;
+            box-shadow: 0 5px 20px rgba(255, 107, 0, 0.5);
+            z-index: 1000;
+        }
+
+        #target-engaged:checked ~ .combat-notification {
+            display: block;
+            animation: notification-slide 0.5s ease-out;
+        }
+
+        @keyframes notification-slide {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <!-- СИСТЕМНЫЕ ФЛАГИ -->
+    <input type="checkbox" id="system-ready">
+    <input type="radio" name="combat-app" id="app-hunt" checked>
+    <input type="radio" name="combat-app" id="app-training">
+    <input type="radio" name="combat-app" id="app-stream">
+    <input type="checkbox" id="target-engaged">
+    <input type="checkbox" id="serb-located">
+
+    <!-- ЗАГРУЗЧИК В СТИЛЕ ВУН-ЧУН -->
+    <div class="wun-chun-loader"></div>
+
+    <!-- БОЕВОЙ РАБОЧИЙ СТОЛ -->
+    <div class="combat-desktop">
+        <!-- СТАТУС НИКОЛАЯ -->
+        <div class="user-status">
+            <h2>⚡ Николай Дидык</h2>
+            <p>🎯 Мастер Вун-Чун</p>
+            <p>📡 Стример ARMA 2</p>
+            <p>🔪 Охотник на Серба</p>
+            <div class="chi-meter">
+                <div class="chi-energy" style="width: 100%"></div>
+            </div>
+        </div>
+
+        <!-- ПРИЛОЖЕНИЕ ОХОТЫ НА СЕРБА -->
+        <div class="combat-app hunt-app">
+            <div class="app-header">
+                <span>🎯 СИСТЕМА ОХОТЫ НА СЕРБА</span>
+                <span>ВУН-ЧУН ПРОТОКОЛ</span>
+            </div>
+            <div class="app-content">
+                <div class="target-info">
+                    <h3>🎯 ЦЕЛЬ: Серб</h3>
+                    <p><strong>Статус:</strong> АКТИВНЫЙ ПОИСК</p>
+                    <p><strong>Угроза:</strong> ВЫСОКАЯ</p>
+                    <p><strong>Тактика:</strong> ВУН-ЧУН + АРМА 2</p>
+                </div>
+
+                <div style="text-align: center; margin: 25px 0;">
+                    <label for="serb-located" class="combat-button">
+                        🔍 НАЧАТЬ ПОИСК СЕРБА
+                    </label>
+                    
+                    <label for="target-engaged" class="combat-button danger">
+                        ⚡ АКТИВИРОВАТЬ ПРОТОКОЛ ВУН-ЧУН
+                    </label>
+                </div>
+
+                <!-- СИСТЕМНЫЕ ЛОГИ -->
+                <div class="stream-overlay">
+                    <strong>СИСТЕМНЫЙ ЖУРНАЛ:</strong><br>
+                    [ВУН-ЧУН] Боевая стойка активирована<br>
+                    [ARMA2] Тактический режим включен<br>
+                    [ОХОТА] Поиск цели: Серб<br>
+                    <span id="hunt-log"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ПРИЛОЖЕНИЕ ТРЕНИРОВОК -->
+        <div class="combat-app training-app">
+            <div class="app-header">
+                <span>🥋 ТРЕНИРОВКИ ВУН-ЧУН</span>
+                <span>СИЛА НИКОЛАЯ</span>
+            </div>
+            <div class="app-content">
+                <h3>Боевые техники против Серба:</h3>
+                <ul>
+                    <li>⚡ Прямые удары цепи</li>
+                    <li>🌀 Круговые защиты</li>
+                    <li>🎯 Точечные атаки</li>
+                    <li>💨 Скоростные комбинации</li>
+                </ul>
+                
+                <div class="chi-meter">
+                    <div class="chi-energy" style="width: 100%"></div>
+                </div>
+                <p>Энергия Ци: 100%</p>
+            </div>
+        </div>
+
+        <!-- ПРИЛОЖЕНИЕ СТРИМИНГА -->
+        <div class="combat-app stream-app">
+            <div class="app-header">
+                <span>📡 СТРИМ ARMA 2</span>
+                <span>НИКОЛАЙ ДИДЫК В ЭФИРЕ</span>
+            </div>
+            <div class="app-content">
+                <div class="stream-overlay">
+                    <strong>ПРЯМОЙ ЭФИР: ОХОТА НА СЕРБА</strong><br>
+                    Зрителей: 1,247<br>
+                    Тема: Тактическая операция<br>
+                    Настроение: Боевое
+                </div>
+                
+                <p>💬 Чат стрима:</p>
+                <div class="stream-overlay" style="height: 150px; overflow-y: auto;">
+                    Зритель1: Николай, покажи технику Вун-Чун!<br>
+                    Зритель2: Серб еще не найден?<br>
+                    Зритель3: ARMA2 + Вун-Чун = непобедимо!<br>
+                    Зритель4: Где мы сегодня ищем Серба?<br>
+                </div>
+            </div>
+        </div>
+
+        <!-- БОЕВАЯ ПАНЕЛЬ -->
+        <div class="combat-panel">
+            <label for="app-hunt" class="combat-button">
+                🎯 ОХОТА
+            </label>
+            
+            <label for="app-training" class="combat-button">
+                🥋 ТРЕНИРОВКА
+            </label>
+            
+            <label for="app-stream" class="combat-button">
+                📡 СТРИМ
+            </label>
+        </div>
+    </div>
+
+    <!-- СИСТЕМНЫЕ УВЕДОМЛЕНИЯ -->
+    <div class="combat-notification">
+        ⚡ ЦЕЛЬ ОБНАРУЖЕНА! СЕРБ В ЗОНЕ ДОСТУПА!
+    </div>
+
+    <!-- СКРИПТЫ СИСТЕМЫ -->
+    <script>
+        // Автозагрузка системы для Николая
+        setTimeout(() => {
+            document.getElementById('system-ready').checked = true;
+        }, 4000);
+
+        // Логика охоты на Серба
+        document.getElementById('serb-located').addEventListener('change', function() {
+            if (this.checked) {
+                setTimeout(() => {
+                    document.getElementById('hunt-log').innerHTML = 
+                        '[СИСТЕМА] Серб обнаружен в сети<br>' +
+                        '[ВУН-ЧУН] Боевая готовность: 100%<br>' +
+                        '[ARMA2] Тактическая карта загружена<br>' +
+                        '[ОХОТА] Перехват инициативы...';
+                }, 1000);
+            }
+        });
+
+        // Активация боевого режима
+        document.getElementById('target-engaged').addEventListener('change', function() {
+            if (this.checked) {
+                setTimeout(() => {
+                    document.getElementById('hunt-log').innerHTML += 
+                        '<br>[ВУН-ЧУН] ⚡ ПРОТОКОЛ АКТИВИРОВАН!<br>' +
+                        '[СИСТЕМА] Николай Дидык вступает в бой!<br>' +
+                        '[ЦЕЛЬ] Серб будет обезврежен!';
+                }, 500);
+            }
+        });
+    </script>
+
+    <!-- ДОПОЛНИТЕЛЬНЫЕ СТИЛИ ДЛЯ РЕЖИМА БОЯ -->
+    <style>
+        #target-engaged:checked ~ .combat-desktop {
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(255, 0, 0, 0.2) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 215, 0, 0.2) 0%, transparent 50%),
+                linear-gradient(135deg, #1a0000 0%, #2d0000 100%);
+            animation: combat-pulse 2s infinite;
+        }
+
+        @keyframes combat-pulse {
+            0%, 100% { background-color: rgba(26, 0, 0, 1); }
+            50% { background-color: rgba(45, 0, 0, 1); }
+        }
+
+        #target-engaged:checked ~ .combat-desktop .hunt-app {
+            border-color: #ff0000;
+            box-shadow: 0 10px 40px rgba(255, 0, 0, 0.5);
+            animation: app-combat-mode 1s infinite;
+        }
+
+        @keyframes app-combat-mode {
+            0%, 100% { border-color: #ff0000; }
+            50% { border-color: #ffd700; }
+        }
+    </style>
+</body>
+</html>

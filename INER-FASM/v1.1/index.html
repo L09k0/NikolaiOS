@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Жалоба в Роскомнадзор от Николая на Серба</title>
+    <style>
+        /* === РЕГИСТРЫ ПРОЦЕССОРА === */
+        .cpu {
+            counter-reset: eax ebx ecx edx eip zf;
+            font-family: 'Courier New', monospace;
+        }
+
+        /* === ИНСТРУКЦИИ АССЕМБЛЕРА === */
+        
+        /* MOV - загрузка данных */
+        #instr-mov:checked ~ .cpu {
+            counter-increment: eip;
+        }
+        #instr-mov:checked ~ .cpu::before {
+            content: "Выполнено: MOV EAX, 'Серб - ублюдок'";
+            display: block;
+            color: red;
+            font-weight: bold;
+        }
+
+        /* ADD - добавление доказательств */
+        #instr-add:checked ~ .cpu {
+            counter-increment: eip;
+        }
+        #instr-add:checked ~ .cpu::after {
+            content: "Выполнено: ADD EBX, 'угрозы найти и наказать'";
+            display: block;
+            color: darkred;
+        }
+
+        /* CMP - сравнение с законом */
+        #instr-cmp:checked ~ .cpu {
+            counter-increment: eip;
+        }
+        #instr-cmp:checked ~ .cpu::before {
+            content: "Выполнено: CMP EAX, 'Уголовный кодекс РФ'";
+            display: block;
+            color: orange;
+        }
+
+        /* JE - переход если нарушение */
+        #instr-je:checked ~ .cpu {
+            counter-increment: eip;
+        }
+        #instr-je:checked ~ .output::before {
+            content: "✓ Нарушение обнаружено! Переход к составлению жалобы";
+            display: block;
+            color: green;
+            font-weight: bold;
+        }
+
+        /* INT - вызов службы (Роскомнадзор) */
+        #instr-int:checked ~ .cpu {
+            counter-increment: eip;
+        }
+        #instr-int:checked ~ .complaint {
+            display: block;
+        }
+
+        /* === ВИЗУАЛИЗАЦИЯ ВЫПОЛНЕНИЯ === */
+        .instruction:checked + label {
+            background: yellow;
+            font-weight: bold;
+        }
+
+        /* === ЖАЛОБА В РОСКОМНАДЗОР === */
+        .complaint {
+            display: none;
+            border: 2px solid red;
+            padding: 20px;
+            margin: 20px 0;
+            background: #fff0f0;
+            font-family: Arial, sans-serif;
+        }
+
+        .complaint h2 {
+            color: red;
+            text-align: center;
+        }
+
+        .complaint .header {
+            text-align: right;
+            margin-bottom: 30px;
+        }
+
+        .complaint .content {
+            line-height: 1.6;
+            text-indent: 40px;
+        }
+
+        .complaint .signature {
+            margin-top: 50px;
+            text-align: right;
+        }
+
+        /* === СТАТУС ПРОЦЕССОРА === */
+        .cpu-status::before {
+            content: "EIP: " counter(eip) " | Флаги: ZF=" counter(zf);
+            display: block;
+            background: #f0f0f0;
+            padding: 10px;
+            margin: 10px 0;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <h1>Интерпретатор FASM для жалобы в Роскомнадзор</h1>
+    
+    <!-- ПАМЯТЬ ПРОЦЕССОРА -->
+    <div class="cpu">
+        <div class="cpu-status"></div>
+    </div>
+
+    <!-- ПРОГРАММА НА АССЕМБЛЕРЕ -->
+    <div class="program">
+        <input type="radio" name="instruction" id="instr-mov">
+        <label for="instr-mov">1. MOV EAX, 'Серб - ублюдок' // Загрузка обвинения</label><br>
+        
+        <input type="radio" name="instruction" id="instr-add">
+        <label for="instr-add">2. ADD EBX, 'угрозы найти и наказать' // Добавление доказательств</label><br>
+        
+        <input type="radio" name="instruction" id="instr-cmp">
+        <label for="instr-cmp">3. CMP EAX, 'Уголовный кодекс РФ' // Проверка на нарушение закона</label><br>
+        
+        <input type="radio" name="instruction" id="instr-je">
+        <label for="instr-je">4. JE violation_found // Переход если нарушение найдено</label><br>
+        
+        <input type="radio" name="instruction" id="instr-int">
+        <label for="instr-int">5. INT 0x70 // Вызов службы Роскомнадзор</label><br>
+    </div>
+
+    <!-- ВЫВОД ИНТЕРПРЕТАТОРА -->
+    <div class="output">
+        <h2>Выполнение программы:</h2>
+    </div>
+
+    <!-- СГЕНЕРИРОВАННАЯ ЖАЛОБА -->
+    <div class="complaint">
+        <div class="header">
+            В Федеральную службу по надзору в сфере связи,<br>
+            информационных технологий и массовых коммуникаций<br>
+            (Роскомнадзор)<br>
+            От гражданина: Николай
+        </div>
+
+        <h2>ЖАЛОБА</h2>
+
+        <div class="content">
+            Настоящим обращением я, Николай, выражаю крайнее возмущение и подаю жалобу 
+            на гражданина, известного под именем Серб. Данное лицо позволяет себе 
+            неприемлемое поведение, оскорбительные высказывания и угрозы в мой адрес.
+            
+            Серб систематически демонстрирует недостойное поведение, оскорбляет мою честь 
+            и достоинство, а также открыто угрожает мне, заявляя о намерении "найти и 
+            разобраться". Подобные действия являются грубым нарушением законодательства 
+            Российской Федерации.
+            
+            В соответствии со статьей 5.61 КоАП РФ "Оскорбление" и статьей 119 УК РФ 
+            "Угроза убийством или причинением тяжкого вреда здоровью", прошу принять 
+            исчерпывающие меры в отношении указанного гражданина.
+            
+            Требую провести проверку по данному факту, привлечь виновного к 
+            ответственности и пресечь противоправные действия в мой адрес.
+        </div>
+
+        <div class="signature">
+            С уважением,<br>
+            Гражданин Николай<br>
+            Дата: _______________<br>
+            Подпись: _____________
+        </div>
+
+        <div class="footer">
+            <em>* Данная жалоба сгенерирована интерпретатором FASM на CSS<br>
+            в учебных целях для демонстрации Тьюринг-полноты CSS</em>
+        </div>
+    </div>
+
+    <!-- ИНСТРУКЦИЯ -->
+    <div style="margin-top: 30px; padding: 15px; background: #f0f8ff; border-radius: 10px;">
+        <h3>Инструкция по использованию интерпретатора:</h3>
+        <p>1. Нажимайте на инструкции по порядку для их выполнения</p>
+        <p>2. После выполнения всех инструкций появится готовая жалоба</p>
+        <p>3. Каждая инструкция изменяет состояние процессора (EIP)</p>
+        <p>4. INT 0x70 - специальное прерывание для генерации жалобы в Роскомнадзор</p>
+    </div>
+
+    <script>
+        // Простая логика для демонстрации выполнения
+        document.querySelectorAll('input[name="instruction"]').forEach((radio, index, arr) => {
+            radio.addEventListener('change', function() {
+                if (this.checked && index < arr.length - 1) {
+                    setTimeout(() => {
+                        arr[index + 1].checked = true;
+                    }, 1000);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

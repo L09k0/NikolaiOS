@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>⚡ ВУН-ЧУН ОС ULTIMATE - Система Николая Дидыка</title>
+    <style>
+        /* === КОСМИЧЕСКАЯ КОНФИГУРАЦИЯ ВУН-ЧУН === */
+        :root {
+            --chi-power: 1000%;
+            --combat-readiness: "MAXIMUM";
+            --serb-hunting-level: "OMEGA";
+            --arma2-integration: "TACTICAL_OVERDRIVE";
+        }
+
+        /* === ВУН-ЧУН ВСЕЛЕННАЯ === */
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000;
+            color: #fff;
+            font-family: 'Orbitron', monospace;
+            overflow: hidden;
+            min-height: 100vh;
+        }
+
+        /* === КВАНТОВЫЙ ЗАГРУЗЧИК === */
+        .quantum-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 50%, #ff6b00 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, #ffd700 0%, transparent 50%),
+                radial-gradient(circle at 40% 80%, #ff0000 0%, transparent 50%),
+                #000;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #ffd700;
+            text-align: center;
+        }
+
+        .quantum-loader::before {
+            content: "⚡ ВУН-ЧУН ОС ULTIMATE ⚡";
+            font-size: 3em;
+            margin-bottom: 30px;
+            text-shadow: 0 0 30px #ff6b00;
+            animation: quantum-pulse 1.5s infinite;
+        }
+
+        .quantum-loader::after {
+            content: "🎯 АКТИВАЦИЯ БОЕВОГО ИИ НИКОЛАЯ\A🥋 ЗАГРУЗКА ТЕХНИК ВУН-ЧУН МАСТЕРА\A📡 ПОДКЛЮЧЕНИЕ К ВСЕМ КАМЕРАМ МИРА\A🛰️ ЗАХВАТ СПУТНИКОВОЙ СЕТИ\A⚡ ИНИЦИАЛИЗАЦИЯ ПРОТОКОЛА 'СМЕРТЬ СЕРБУ'";
+            white-space: pre;
+            line-height: 2;
+            font-size: 1.2em;
+            animation: boot-sequence 6s forwards;
+        }
+
+        @keyframes quantum-pulse {
+            0%, 100% { 
+                transform: scale(1);
+                text-shadow: 0 0 30px #ff6b00;
+            }
+            50% { 
+                transform: scale(1.1);
+                text-shadow: 0 0 50px #ffd700, 0 0 100px #ff0000;
+            }
+        }
+
+        @keyframes boot-sequence {
+            100% {
+                content: "⚡ СИСТЕМА АКТИВИРОВАНА ⚡\A🎯 ПОЛЬЗОВАТЕЛЬ: НИКОЛАЙ ДИДЫК\A🥋 УРОВЕНЬ: ВУН-ЧУН МАСТЕР\A📡 СТАТУС: ВСЕМИРНАЯ ОХОТА АКТИВНА\A🛰️ СЕРБ: ОБНАРУЖЕНИЕ ЧЕРЕЗ 3...2...1...";
+            }
+        }
+
+        /* === БОЕВОЙ ИНТЕРФЕЙС === */
+        .wun-chun-universe {
+            display: none;
+            position: relative;
+            min-height: 100vh;
+            background: 
+                url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,107,0,0.3)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>'),
+                radial-gradient(circle at 20% 80%, rgba(255, 107, 0, 0.4) 0%, transparent 70%),
+                radial-gradient(circle at 80% 20%, rgba(255, 215, 0, 0.3) 0%, transparent 70%),
+                radial-gradient(circle at 40% 40%, rgba(255, 0, 0, 0.2) 0%, transparent 70%),
+                linear-gradient(135deg, #000000 0%, #1a0000 50%, #000000 100%);
+        }
+
+        #universe-ready:checked ~ .quantum-loader {
+            display: none;
+        }
+
+        #universe-ready:checked ~ .wun-chun-universe {
+            display: block;
+        }
+
+        /* === ЦЕНТРАЛЬНЫЙ БОЕВОЙ ХАБ === */
+        .combat-hub {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            height: 80%;
+            background: rgba(0, 0, 0, 0.95);
+            border: 3px solid #ff6b00;
+            border-radius: 20px;
+            box-shadow: 
+                0 0 50px rgba(255, 107, 0, 0.7),
+                inset 0 0 50px rgba(255, 215, 0, 0.3);
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 10px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        /* === БОЕВЫЕ МОДУЛИ === */
+        .combat-module {
+            background: rgba(255, 107, 0, 0.1);
+            border: 2px solid #ff6b00;
+            border-radius: 15px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .combat-module:hover {
+            background: rgba(255, 107, 0, 0.2);
+            border-color: #ffd700;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(255, 107, 0, 0.5);
+        }
+
+        .module-header {
+            color: #ffd700;
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* === МОДУЛЬ КВАНТОВОГО ПОИСКА === */
+        .quantum-search {
+            grid-column: 1 / 3;
+        }
+
+        .satellite-radar {
+            width: 100%;
+            height: 200px;
+            background: 
+                radial-gradient(circle, transparent 60%, rgba(255, 107, 0, 0.3) 100%),
+                conic-gradient(from 0deg, #ff0000, #ff6b00, #ffd700, #ff6b00, #ff0000);
+            border-radius: 10px;
+            position: relative;
+            animation: radar-sweep 4s linear infinite;
+        }
+
+        @keyframes radar-sweep {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* === МОДУЛЬ АРМА 2 ТАКТИКА === */
+        .arma-tactical {
+            background: rgba(0, 255, 0, 0.1);
+            border-color: #00ff00;
+        }
+
+        .tactical-map {
+            width: 100%;
+            height: 150px;
+            background: 
+                linear-gradient(45deg, #000 25%, transparent 25%),
+                linear-gradient(-45deg, #000 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, #000 75%),
+                linear-gradient(-45deg, transparent 75%, #000 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+            border: 1px solid #00ff00;
+        }
+
+        /* === МОДУЛЬ ВУН-ЧУН ТЕХНИКИ === */
+        .wun-chun-techniques {
+            grid-row: 1 / 3;
+            grid-column: 3;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+        }
+
+        .technique-item {
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid #ffd700;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .technique-item:hover {
+            background: rgba(255, 215, 0, 0.3);
+            transform: scale(1.05);
+        }
+
+        /* === МОДУЛЬ СИЛЫ ЦИ === */
+        .chi-power-module {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .chi-orb {
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, #ffd700, #ff6b00, #ff0000);
+            border-radius: 50%;
+            animation: chi-rotate 3s linear infinite;
+            box-shadow: 
+                0 0 50px #ffd700,
+                0 0 100px #ff6b00,
+                inset 0 0 50px #ff0000;
+        }
+
+        @keyframes chi-rotate {
+            from { transform: rotate(0deg) scale(1); }
+            50% { transform: rotate(180deg) scale(1.2); }
+            to { transform: rotate(360deg) scale(1); }
+        }
+
+        /* === МОДУЛЬ СТРИМИНГА === */
+        .stream-module {
+            background: rgba(0, 100, 255, 0.1);
+            border-color: #0066ff;
+        }
+
+        .live-chat {
+            height: 120px;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid #0066ff;
+            border-radius: 8px;
+            padding: 10px;
+            font-size: 0.9em;
+        }
+
+        /* === БОЕВАЯ ПАНЕЛЬ УПРАВЛЕНИЯ === */
+        .combat-control-panel {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.95), transparent);
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        /* === КВАНТОВЫЕ КНОПКИ === */
+        .quantum-button {
+            background: linear-gradient(135deg, #ff6b00, #ff0000);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-family: 'Orbitron', monospace;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            box-shadow: 
+                0 5px 15px rgba(255, 107, 0, 0.5),
+                0 0 20px rgba(255, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quantum-button::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            transform: rotate(45deg);
+            transition: all 0.5s ease;
+        }
+
+        .quantum-button:hover::before {
+            left: 100%;
+        }
+
+        .quantum-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 
+                0 10px 25px rgba(255, 107, 0, 0.7),
+                0 0 30px rgba(255, 0, 0, 0.5);
+        }
+
+        .quantum-button.ultimate {
+            background: linear-gradient(135deg, #ff0000, #8b0000);
+            box-shadow: 
+                0 5px 20px rgba(255, 0, 0, 0.7),
+                0 0 30px rgba(139, 0, 0, 0.5);
+        }
+
+        /* === СИСТЕМНЫЕ УВЕДОМЛЕНИЯ === */
+        .quantum-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #ff0000, #ff6b00);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 15px;
+            display: none;
+            font-weight: bold;
+            font-size: 1.1em;
+            box-shadow: 
+                0 5px 25px rgba(255, 0, 0, 0.7),
+                0 0 30px rgba(255, 107, 0, 0.5);
+            z-index: 1000;
+            animation: notification-pulse 2s infinite;
+        }
+
+        @keyframes notification-pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        /* === АНИМАЦИИ ПОИСКА СЕРБА === */
+        .serb-tracker {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 0, 0, 0.2);
+            border: 2px solid #ff0000;
+            border-radius: 10px;
+            padding: 15px;
+            backdrop-filter: blur(5px);
+        }
+
+        #serb-found:checked ~ .serb-tracker {
+            animation: target-locked 1s infinite;
+            background: rgba(0, 255, 0, 0.2);
+            border-color: #00ff00;
+        }
+
+        @keyframes target-locked {
+            0%, 100% { box-shadow: 0 0 20px rgba(0, 255, 0, 0.5); }
+            50% { box-shadow: 0 0 40px rgba(0, 255, 0, 0.8); }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- СИСТЕМНЫЕ ФЛАГИ -->
+    <input type="checkbox" id="universe-ready">
+    <input type="checkbox" id="serb-found">
+    <input type="checkbox" id="quantum-search-active">
+    <input type="checkbox" id="chi-power-max">
+    <input type="checkbox" id="arma-tactical-active">
+
+    <!-- КВАНТОВЫЙ ЗАГРУЗЧИК -->
+    <div class="quantum-loader"></div>
+
+    <!-- ВУН-ЧУН ВСЕЛЕННАЯ -->
+    <div class="wun-chun-universe">
+        <!-- ЦЕНТРАЛЬНЫЙ БОЕВОЙ ХАБ -->
+        <div class="combat-hub">
+            <!-- МОДУЛЬ КВАНТОВОГО ПОИСКА -->
+            <div class="combat-module quantum-search">
+                <div class="module-header">🛰️ КВАНТОВЫЙ ПОИСК СЕРБА</div>
+                <div class="satellite-radar"></div>
+                <div style="text-align: center; margin-top: 15px;">
+                    <label for="quantum-search-active" class="quantum-button">
+                        🌐 АКТИВИРОВАТЬ ВСЕМИРНЫЙ ПОИСК
+                    </label>
+                </div>
+            </div>
+
+            <!-- МОДУЛЬ АРМА 2 ТАКТИКА -->
+            <div class="combat-module arma-tactical">
+                <div class="module-header">🎯 ARMA 2 ТАКТИЧЕСКИЙ ЦЕНТР</div>
+                <div class="tactical-map"></div>
+                <div style="text-align: center; margin-top: 10px;">
+                    <label for="arma-tactical-active" class="quantum-button" style="background: linear-gradient(135deg, #00ff00, #008800);">
+                        🎮 АКТИВИРОВАТЬ ТАКТИЧЕСКИЙ РЕЖИМ
+                    </label>
+                </div>
+            </div>
+
+            <!-- МОДУЛЬ ВУН-ЧУН ТЕХНИК -->
+            <div class="combat-module wun-chun-techniques">
+                <div class="module-header">🥋 ТЕХНИКИ ВУН-ЧУН</div>
+                <div class="technique-item">⚡ ПРЯМОЙ УДАР ЦЕПИ</div>
+                <div class="technique-item">🌀 ВРАЩАЮЩАЯСЯ ЗАЩИТА</div>
+                <div class="technique-item">🎯 ТОЧЕЧНЫЙ УДАР ЛОКОТЕМ</div>
+                <div class="technique-item">💨 СКОРОСТНАЯ КОМБИНАЦИЯ</div>
+                <div class="technique-item">🌪️ ВИХРЕВАЯ АТАКА</div>
+                <div class="technique-item">🔥 УДАР ДРАКОНА</div>
+            </div>
+
+            <!-- МОДУЛЬ СИЛЫ ЦИ -->
+            <div class="combat-module chi-power-module">
+                <div class="module-header">⚡ ЭНЕРГИЯ ЦИ</div>
+                <div class="chi-orb"></div>
+                <div style="margin-top: 15px;">
+                    <label for="chi-power-max" class="quantum-button">
+                        💥 МАКСИМАЛЬНАЯ СИЛА ЦИ
+                    </label>
+                </div>
+            </div>
+
+            <!-- МОДУЛЬ СТРИМИНГА -->
+            <div class="combat-module stream-module">
+                <div class="module-header">📡 ПРЯМОЙ ЭФИР НИКОЛАЯ</div>
+                <div class="live-chat">
+                    [Зритель] Николай, покажи технику Вун-Чун!<br>
+                    [Зритель] Серб уже найден?<br>
+                    [Зритель] ARMA2 + Вун-Чун = БОГ!<br>
+                    [Модератор] Всем привет в стриме!<br>
+                    [Зритель] Николай, когда следующая тренировка?<br>
+                    [Зритель] Серб дрожит от страха!<br>
+                </div>
+                <div style="text-align: center; margin-top: 10px;">
+                    <div class="quantum-button" style="background: linear-gradient(135deg, #0066ff, #0044aa);">
+                        🔴 НАЧАТЬ ТРАНСЛЯЦИЮ
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- БОЕВАЯ ПАНЕЛЬ УПРАВЛЕНИЯ -->
+        <div class="combat-control-panel">
+            <label for="serb-found" class="quantum-button ultimate">
+                ⚡ АКТИВИРОВАТЬ ПРОТОКОЛ "СМЕРТЬ СЕРБУ"
+            </label>
+            
+            <div class="quantum-button" style="background: linear-gradient(135deg, #ffd700, #ff6b00);">
+                🥋 ТРЕНИРОВОЧНЫЙ РЕЖИМ
+            </div>
+            
+            <div class="quantum-button" style="background: linear-gradient(135deg, #00ff00, #008800);">
+                🎮 ARMA 2 СИМУЛЯЦИЯ
+            </div>
+        </div>
+
+        <!-- ТРЕКЕР СЕРБА -->
+        <div class="serb-tracker">
+            <strong>🎯 ЦЕЛЬ: СЕРБ</strong><br>
+            Статус: <span id="serb-status">ПОИСК...</span><br>
+            Уровень угрозы: КРИТИЧЕСКИЙ<br>
+            Координаты: ЗАГРУЗКА...
+        </div>
+    </div>
+
+    <!-- СИСТЕМНЫЕ УВЕДОМЛЕНИЯ -->
+    <div class="quantum-notification" id="main-notification">
+        ⚡ СИСТЕМА ВУН-ЧУН АКТИВИРОВАНА!
+    </div>
+
+    <!-- КВАНТОВЫЕ СКРИПТЫ -->
+    <script>
+        // Активация вселенной Вун-Чун
+        setTimeout(() => {
+            document.getElementById('universe-ready').checked = true;
+            document.getElementById('main-notification').style.display = 'block';
+            
+            setTimeout(() => {
+                document.getElementById('main-notification').style.display = 'none';
+            }, 5000);
+        }, 6000);
+
+        // Система поиска Серба
+        document.getElementById('quantum-search-active').addEventListener('change', function() {
+            if (this.checked) {
+                document.getElementById('main-notification').textContent = '🛰️ АКТИВИРОВАН ВСЕМИРНЫЙ ПОИСК СЕРБА!';
+                document.getElementById('main-notification').style.display = 'block';
+                
+                setTimeout(() => {
+                    document.getElementById('serb-status').textContent = 'ОБНАРУЖЕН!';
+                    document.getElementById('serb-found').checked = true;
+                    document.getElementById('main-notification').textContent = '🎯 СЕРБ НАЙДЕН! КООРДИНАТЫ ПОЛУЧЕНЫ!';
+                }, 3000);
+            }
+        });
+
+        // Активация тактического режима ARMA 2
+        document.getElementById('arma-tactical-active').addEventListener('change', function() {
+            if (this.checked) {
+                document.getElementById('main-notification').textContent = '🎯 ARMA 2 ТАКТИЧЕСКИЙ РЕЖИМ АКТИВИРОВАН!';
+                document.getElementById('main-notification').style.display = 'block';
+            }
+        });
+
+        // Максимальная сила Ци
+        document.getElementById('chi-power-max').addEventListener('change', function() {
+            if (this.checked) {
+                document.getElementById('main-notification').textContent = '💥 МАКСИМАЛЬНАЯ СИЛА ЦИ ДОСТИГНУТА!';
+                document.getElementById('main-notification').style.display = 'block';
+            }
+        });
+
+        // Финальный протокол
+        document.getElementById('serb-found').addEventListener('change', function() {
+            if (this.checked) {
+                setTimeout(() => {
+                    document.getElementById('main-notification').innerHTML = 
+                        '⚡ ПРОТОКОЛ "СМЕРТЬ СЕРБУ" АКТИВИРОВАН!<br>🎯 ЦЕЛЬ ЗАХВАЧЕНА!<br>🥋 НИКОЛАЙ ДИДЫК ПОБЕДИЛ!';
+                    document.getElementById('main-notification').style.display = 'block';
+                    document.getElementById('main-notification').style.background = 
+                        'linear-gradient(135deg, #00ff00, #008800)';
+                    
+                    // Активация победной анимации
+                    document.querySelector('.wun-chun-universe').style.animation = 'victory-pulse 1s infinite';
+                }, 1000);
+            }
+        });
+
+        // Добавляем стиль для победы
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes victory-pulse {
+                0%, 100% { 
+                    background: linear-gradient(135deg, #000000, #1a0000); 
+                }
+                50% { 
+                    background: linear-gradient(135deg, #001a00, #003300); 
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

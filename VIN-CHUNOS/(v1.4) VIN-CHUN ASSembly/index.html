@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>⚡ ВУН-ЧУН АССЕМБЛЕР ТЕРМИНАЛ - Система Николая Дидыка</title>
+    <style>
+        /* === АБСОЛЮТНЫЙ ТЕРМИНАЛ ВУН-ЧУН === */
+        :root {
+            --assembler-mode: "ACTIVE";
+            --chi-register: "EAX=0xFFFFFFFF";
+            --serb-memory: "0xDEADBEEF";
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000000;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            overflow: hidden;
+            height: 100vh;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(0, 255, 0, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(255, 107, 0, 0.1) 0%, transparent 50%),
+                linear-gradient(45deg, #001100 25%, transparent 25%),
+                linear-gradient(-45deg, #001100 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, #001100 75%),
+                linear-gradient(-45deg, transparent 75%, #001100 75%);
+            background-size: 100px 100px;
+            background-position: 0 0, 0 50px, 50px -50px, -50px 0px;
+        }
+
+        /* === СОВЕРШЕННЫЙ ТЕРМИНАЛ === */
+        .ultimate-terminal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 10, 0, 0.98);
+            border: 3px solid #00ff00;
+            box-shadow: 
+                inset 0 0 200px #00ff00,
+                0 0 100px #00ff00;
+            display: flex;
+            flex-direction: column;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1em;
+        }
+
+        /* === ЗАГРУЗОЧНЫЙ ЭКРАН АССЕМБЛЕРА === */
+        .assembler-boot {
+            padding: 20px;
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        .boot-line {
+            margin: 8px 0;
+            animation: type-line 0.2s linear forwards;
+            opacity: 0;
+        }
+
+        @keyframes type-line {
+            to { opacity: 1; }
+        }
+
+        /* === ОСНОВНОЙ ИНТЕРФЕЙС === */
+        .terminal-interface {
+            display: none;
+            height: 100%;
+            flex-direction: column;
+        }
+
+        #assembler-ready:checked ~ .ultimate-terminal .assembler-boot {
+            display: none;
+        }
+
+        #assembler-ready:checked ~ .ultimate-terminal .terminal-interface {
+            display: flex;
+        }
+
+        /* === ПАНЕЛЬ РЕГИСТРОВ === */
+        .register-panel {
+            background: rgba(0, 30, 0, 0.9);
+            border-bottom: 2px solid #00ff00;
+            padding: 10px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            font-size: 0.9em;
+        }
+
+        .register {
+            background: rgba(0, 255, 0, 0.1);
+            border: 1px solid #00ff00;
+            padding: 5px;
+            border-radius: 3px;
+        }
+
+        .register-value {
+            color: #ffff00;
+            font-weight: bold;
+        }
+
+        /* === ОБЛАСТЬ КОДА === */
+        .code-area {
+            flex: 1;
+            display: flex;
+            height: calc(100% - 120px);
+        }
+
+        .assembly-editor {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.9);
+            border-right: 2px solid #00ff00;
+            padding: 20px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            line-height: 1.4;
+        }
+
+        .code-line {
+            margin: 5px 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .line-number {
+            color: #008800;
+            margin-right: 15px;
+            min-width: 30px;
+        }
+
+        .assembly-code {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1em;
+            outline: none;
+            width: 100%;
+        }
+
+        /* === ВЫВОД АССЕМБЛЕРА === */
+        .assembler-output {
+            width: 400px;
+            background: rgba(0, 20, 0, 0.95);
+            border-left: 2px solid #00ff00;
+            padding: 20px;
+            overflow-y: auto;
+            font-size: 0.9em;
+        }
+
+        .output-line {
+            margin: 8px 0;
+            animation: output-fade 0.3s ease-in;
+        }
+
+        @keyframes output-fade {
+            from { opacity: 0; transform: translateX(10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* === КОМАНДНАЯ СТРОКА === */
+        .command-panel {
+            background: rgba(0, 40, 0, 0.9);
+            border-top: 2px solid #00ff00;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .command-prompt {
+            color: #00ff00;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+
+        .command-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1em;
+            outline: none;
+        }
+
+        /* === СТИЛИ АССЕМБЛЕРА === */
+        .asm-comment {
+            color: #008800;
+            font-style: italic;
+        }
+
+        .asm-instruction {
+            color: #00ffff;
+            font-weight: bold;
+        }
+
+        .asm-register {
+            color: #ffff00;
+        }
+
+        .asm-memory {
+            color: #ff6b00;
+        }
+
+        .asm-label {
+            color: #ff00ff;
+        }
+
+        .asm-directive {
+            color: #00aaff;
+        }
+
+        /* === АНИМАЦИИ === */
+        .execution-highlight {
+            background: rgba(0, 255, 0, 0.2);
+            animation: execute-pulse 1s infinite;
+        }
+
+        @keyframes execute-pulse {
+            0%, 100% { background: rgba(0, 255, 0, 0.2); }
+            50% { background: rgba(0, 255, 0, 0.4); }
+        }
+
+        /* === СИСТЕМНЫЕ УВЕДОМЛЕНИЯ === */
+        .asm-alert {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 0, 0, 0.9);
+            color: white;
+            padding: 15px;
+            border: 2px solid #ff0000;
+            border-radius: 5px;
+            display: none;
+            font-weight: bold;
+            z-index: 1000;
+            animation: alert-blink 1s infinite;
+        }
+
+        @keyframes alert-blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+    </style>
+</head>
+<body>
+    <!-- СИСТЕМНЫЕ ФЛАГИ -->
+    <input type="checkbox" id="assembler-ready">
+    <input type="checkbox" id="execution-started">
+    <input type="checkbox" id="serb-eliminated">
+
+    <!-- СОВЕРШЕННЫЙ ТЕРМИНАЛ -->
+    <div class="ultimate-terminal">
+        <!-- ЗАГРУЗОЧНЫЙ ЭКРАН -->
+        <div class="assembler-boot" id="bootScreen">
+            <div class="boot-line">⚡ ВУН-ЧУН АССЕМБЛЕР ТЕРМИНАЛ v3.0</div>
+            <div class="boot-line">🎯 СИСТЕМА НИКОЛАЯ ДИДЫКА - МАСТЕР ВУН-ЧУН</div>
+            <div class="boot-line"> </div>
+            <div class="boot-line">📀 ИНИЦИАЛИЗАЦИЯ ПРОЦЕССОРА...</div>
+            <div class="boot-line">💾 ЗАГРУЗКА РЕГИСТРОВ ВУН-ЧУН...</div>
+            <div class="boot-line">🔧 НАСТРОЙКА АССЕМБЛЕРА x86_64...</div>
+            <div class="boot-line">🎮 ИНТЕГРАЦИЯ ARMA 2 ТАКТИКИ...</div>
+            <div class="boot-line">👹 АКТИВАЦИЯ BACK TO HELL...</div>
+            <div class="boot-line">📡 ПОДКЛЮЧЕНИЕ STEAM СТРИМА...</div>
+            <div class="boot-line">⚡ КОМПИЛЯЦИЯ БОЕВЫХ ПРОТОКОЛОВ...</div>
+            <div class="boot-line">💥 СИСТЕМА ГОТОВА К АССЕМБЛИРОВАНИЮ</div>
+        </div>
+
+        <!-- ОСНОВНОЙ ИНТЕРФЕЙС -->
+        <div class="terminal-interface">
+            <!-- ПАНЕЛЬ РЕГИСТРОВ -->
+            <div class="register-panel">
+                <div class="register">EAX: <span class="register-value" id="regEAX">0x00000000</span></div>
+                <div class="register">EBX: <span class="register-value" id="regEBX">0x00000000</span></div>
+                <div class="register">ECX: <span class="register-value" id="regECX">0x00000000</span></div>
+                <div class="register">EDX: <span class="register-value" id="regEDX">0x00000000</span></div>
+                <div class="register">ESI: <span class="register-value" id="regESI">0x00000000</span></div>
+                <div class="register">EDI: <span class="register-value" id="regEDI">0x00000000</span></div>
+                <div class="register">EBP: <span class="register-value" id="regEBP">0x00000000</span></div>
+                <div class="register">ESP: <span class="register-value" id="regESP">0x00000000</span></div>
+                <div class="register">EIP: <span class="register-value" id="regEIP">0x00401000</span></div>
+                <div class="register">EFLAGS: <span class="register-value" id="regEFLAGS">0x00000246</span></div>
+                <div class="register">CHI: <span class="register-value" id="regCHI">0x00000000</span></div>
+                <div class="register">SERB: <span class="register-value" id="regSERB">0x00000000</span></div>
+            </div>
+
+            <!-- ОБЛАСТЬ КОДА -->
+            <div class="code-area">
+                <!-- РЕДАКТОР АССЕМБЛЕРА -->
+                <div class="assembly-editor" id="assemblyEditor">
+                    <div class="code-line" id="line1">
+                        <span class="line-number">1</span>
+                        <span class="asm-directive">.code</span>
+                    </div>
+                    <div class="code-line" id="line2">
+                        <span class="line-number">2</span>
+                        <span class="asm-directive">.model flat, stdcall</span>
+                    </div>
+                    <div class="code-line" id="line3">
+                        <span class="line-number">3</span>
+                        <span class="asm-label">main</span> <span class="asm-directive">proc</span>
+                    </div>
+                    <div class="code-line" id="line4">
+                        <span class="line-number">4</span>
+                        <span class="asm-comment">; 🥋 АКТИВАЦИЯ ВУН-ЧУН СИЛЫ</span>
+                    </div>
+                    <div class="code-line" id="line5">
+                        <span class="line-number">5</span>
+                        <span class="asm-instruction">mov</span> <span class="asm-register">eax</span>, <span class="asm-memory">0xDEADBEEF</span> <span class="asm-comment">; Сила Вун-Чун</span>
+                    </div>
+                    <div class="code-line" id="line6">
+                        <span class="line-number">6</span>
+                        <span class="asm-instruction">mov</span> <span class="asm-register">ebx</span>, <span class="asm-memory">0xCAFEBABE</span> <span class="asm-comment">; Энергия Ци</span>
+                    </div>
+                    <div class="code-line" id="line7">
+                        <span class="line-number">7</span>
+                        <span class="asm-comment">; 🎯 ПОИСК СЕРБА</span>
+                    </div>
+                    <div class="code-line" id="line8">
+                        <span class="line-number">8</span>
+                        <span class="asm-instruction">call</span> <span class="asm-label">find_serb</span>
+                    </div>
+                    <div class="code-line" id="line9">
+                        <span class="line-number">9</span>
+                        <span class="asm-instruction">cmp</span> <span class="asm-register">eax</span>, <span class="asm-memory">0</span>
+                    </div>
+                    <div class="code-line" id="line10">
+                        <span class="line-number">10</span>
+                        <span class="asm-instruction">je</span> <span class="asm-label">serb_not_found</span>
+                    </div>
+                    <div class="code-line" id="line11">
+                        <span class="line-number">11</span>
+                        <span class="asm-comment">; 💥 АТАКА ВУН-ЧУН</span>
+                    </div>
+                    <div class="code-line" id="line12">
+                        <span class="line-number">12</span>
+                        <span class="asm-instruction">call</span> <span class="asm-label">wun_chun_attack</span>
+                    </div>
+                    <div class="code-line" id="line13">
+                        <span class="line-number">13</span>
+                        <span class="asm-comment">; 👹 BACK TO HELL</span>
+                    </div>
+                    <div class="code-line" id="line14">
+                        <span class="line-number">14</span>
+                        <span class="asm-instruction">call</span> <span class="asm-label">back_to_hell</span>
+                    </div>
+                    <div class="code-line" id="line15">
+                        <span class="line-number">15</span>
+                        <span class="asm-comment">; 🎮 ARMA 2 ФИНАЛ</span>
+                    </div>
+                    <div class="code-line" id="line16">
+                        <span class="line-number">16</span>
+                        <span class="asm-instruction">call</span> <span class="asm-label">arma2_finish</span>
+                    </div>
+                    <div class="code-line" id="line17">
+                        <span class="line-number">17</span>
+                        <span class="asm-label">serb_eliminated:</span>
+                    </div>
+                    <div class="code-line" id="line18">
+                        <span class="line-number">18</span>
+                        <span class="asm-instruction">mov</span> <span class="asm-register">eax</span>, <span class="asm-memory">1</span> <span class="asm-comment">; УСПЕХ</span>
+                    </div>
+                    <div class="code-line" id="line19">
+                        <span class="line-number">19</span>
+                        <span class="asm-instruction">ret</span>
+                    </div>
+                    <div class="code-line" id="line20">
+                        <span class="line-number">20</span>
+                        <span class="asm-label">main</span> <span class="asm-directive">endp</span>
+                    </div>
+                </div>
+
+                <!-- ВЫВОД АССЕМБЛЕРА -->
+                <div class="assembler-output" id="assemblerOutput">
+                    <div class="output-line">⚡ ВУН-ЧУН АССЕМБЛЕР АКТИВЕН</div>
+                    <div class="output-line">🎯 ЦЕЛЬ: ЛИКВИДАЦИЯ СЕРБА</div>
+                    <div class="output-line">🥋 СИЛА ВУН-ЧУН: ГОТОВА</div>
+                    <div class="output-line"> </div>
+                    <div class="output-line">ДОСТУПНЫЕ КОМАНДЫ:</div>
+                    <div class="output-line">• assemble - компиляция кода</div>
+                    <div class="output-line">• execute - выполнение программы</div>
+                    <div class="output-line">• debug - отладка</div>
+                    <div class="output-line">• reset - сброс системы</div>
+                    <div class="output-line">• help - справка</div>
+                </div>
+            </div>
+
+            <!-- КОМАНДНАЯ СТРОКА -->
+            <div class="command-panel">
+                <span class="command-prompt">nikolay@asm-terminal:~#</span>
+                <input type="text" class="command-input" id="commandInput" placeholder="Введите команду ассемблера...">
+            </div>
+        </div>
+    </div>
+
+    <!-- СИСТЕМНЫЕ УВЕДОМЛЕНИЯ -->
+    <div class="asm-alert" id="asmAlert">
+        ⚡ АССЕМБЛЕР ГОТОВ
+    </div>
+
+    <script>
+        // Инициализация системы
+        setTimeout(() => {
+            document.getElementById('assembler-ready').checked = true;
+            showAlert('⚡ ВУН-ЧУН АССЕМБЛЕР АКТИВИРОВАН');
+            
+            // Анимация загрузки
+            const bootLines = document.querySelectorAll('.boot-line');
+            bootLines.forEach((line, index) => {
+                line.style.animationDelay = (index * 0.3) + 's';
+            });
+        }, 2000);
+
+        // Система команд ассемблера
+        const commandInput = document.getElementById('commandInput');
+        const output = document.getElementById('assemblerOutput');
+        const asmAlert = document.getElementById('asmAlert');
+
+        commandInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const command = this.value.trim().toLowerCase();
+                this.value = '';
+                
+                addOutputLine(`<span style="color: #00ffff">nikolay@asm-terminal:~# ${command}</span>`);
+                processAssemblerCommand(command);
+                
+                output.scrollTop = output.scrollHeight;
+            }
+        });
+
+        function processAssemblerCommand(command) {
+            switch(command) {
+                case 'assemble':
+                    assembleCode();
+                    break;
+                case 'execute':
+                    executeProgram();
+                    break;
+                case 'debug':
+                    startDebug();
+                    break;
+                case 'reset':
+                    resetSystem();
+                    break;
+                case 'help':
+                    showHelp();
+                    break;
+                case 'find_serb':
+                    manualFindSerb();
+                    break;
+                case 'wun_chun':
+                    activateWunChun();
+                    break;
+                default:
+                    addOutputLine(`<span style="color: #ff0000">ОШИБКА: Неизвестная команда '${command}'</span>`);
+            }
+        }
+
+        function assembleCode() {
+            addOutputLine('<span style="color: #ffff00">🔧 КОМПИЛЯЦИЯ АССЕМБЛЕРНОГО КОДА...</span>');
+            
+            setTimeout(() => {
+                addOutputLine('<span style="color: #00ff00">✅ КОД УСПЕШНО СКОМПИЛИРОВАН</span>');
+                addOutputLine('<span style="color: #00ff00">📦 Размер: 256 байт</span>');
+                addOutputLine('<span style="color: #00ff00">🎯 Цель: Серб - ЛИКВИДАЦИЯ</span>');
+                showAlert('✅ КОМПИЛЯЦИЯ УСПЕШНА');
+            }, 1500);
+        }
+
+        function executeProgram() {
+            addOutputLine('<span style="color: #ff6b00">⚡ ВЫПОЛНЕНИЕ ПРОГРАММЫ...</span>');
+            document.getElementById('execution-started').checked = true;
+            
+            // Последовательное выполнение с анимацией
+            executeLineByLine();
+        }
+
+        function executeLineByLine() {
+            const lines = document.querySelectorAll('.code-line');
+            let currentLine = 0;
+            
+            function executeNextLine() {
+                if (currentLine < lines.length) {
+                    // Снимаем выделение с предыдущей строки
+                    lines.forEach(line => line.classList.remove('execution-highlight'));
+                    
+                    // Выделяем текущую строку
+                    lines[currentLine].classList.add('execution-highlight');
+                    
+                    // Обработка конкретных инструкций
+                    processAssemblyLine(currentLine + 1);
+                    
+                    currentLine++;
+                    setTimeout(executeNextLine, 800);
+                } else {
+                    addOutputLine('<span style="color: #00ff00">🎉 ПРОГРАММА ВЫПОЛНЕНА УСПЕШНО!</span>');
+                    showAlert('🎯 СЕРБ ЛИКВИДИРОВАН!');
+                }
+            }
+            
+            executeNextLine();
+        }
+
+        function processAssemblyLine(lineNumber) {
+            switch(lineNumber) {
+                case 5:
+                    updateRegister('EAX', '0xDEADBEEF');
+                    addOutputLine('<span style="color: #ffff00">🥋 ВУН-ЧУН СИЛА АКТИВИРОВАНА</span>');
+                    break;
+                case 6:
+                    updateRegister('EBX', '0xCAFEBABE');
+                    addOutputLine('<span style="color: #ffff00">⚡ ЭНЕРГИЯ ЦИ: МАКСИМУМ</span>');
+                    break;
+                case 8:
+                    addOutputLine('<span style="color: #00ffff">🎯 ВЫЗОВ ПОИСКА СЕРБА...</span>');
+                    setTimeout(() => {
+                        updateRegister('EAX', '0xSERB001');
+                        addOutputLine('<span style="color: #00ff00">🎯 СЕРБ ОБНАРУЖЕН!</span>');
+                    }, 500);
+                    break;
+                case 12:
+                    addOutputLine('<span style="color: #ff0000">💥 ВУН-ЧУН АТАКА АКТИВИРОВАНА!</span>');
+                    updateRegister('CHI', '0xFFFFFFFF');
+                    break;
+                case 14:
+                    addOutputLine('<span style="color: #ff6b00">👹 BACK TO HELL АКТИВИРОВАН!</span>');
+                    break;
+                case 16:
+                    addOutputLine('<span style="color: #00aaff">🎮 ARMA 2 ФИНАЛЬНАЯ СТАДИЯ!</span>');
+                    break;
+                case 18:
+                    updateRegister('SERB', '0x00000000');
+                    addOutputLine('<span style="color: #00ff00">🎉 СЕРБ ЛИКВИДИРОВАН!</span>');
+                    document.getElementById('serb-eliminated').checked = true;
+                    break;
+            }
+        }
+
+        function updateRegister(regName, value) {
+            const regElement = document.getElementById('reg' + regName);
+            if (regElement) {
+                regElement.textContent = value;
+                regElement.style.animation = 'register-update 0.5s ease-in-out';
+                setTimeout(() => {
+                    regElement.style.animation = '';
+                }, 500);
+            }
+        }
+
+        function startDebug() {
+            addOutputLine('<span style="color: #ff00ff">🐛 ЗАПУСК ОТЛАДЧИКА...</span>');
+            addOutputLine('<span style="color: #ff00ff">📝 Регистры проверены</span>');
+            addOutputLine('<span style="color: #ff00ff">🎯 Цель: Серб - доступен для атаки</span>');
+            addOutputLine('<span style="color: #ff00ff">⚡ Вун-Чун: готов к бою</span>');
+        }
+
+        function resetSystem() {
+            addOutputLine('<span style="color: #ffff00">🔄 СБРОС СИСТЕМЫ...</span>');
+            
+            // Сброс регистров
+            const registers = ['EAX', 'EBX', 'ECX', 'EDX', 'ESI', 'EDI', 'EBP', 'ESP', 'CHI', 'SERB'];
+            registers.forEach(reg => updateRegister(reg, '0x00000000'));
+            
+            // Сброс выделения строк
+            document.querySelectorAll('.code-line').forEach(line => {
+                line.classList.remove('execution-highlight');
+            });
+            
+            addOutputLine('<span style="color: #00ff00">✅ СИСТЕМА СБРОШЕНА</span>');
+        }
+
+        function showHelp() {
+            addOutputLine('<span style="color: #00ffff">📖 СПРАВКА ПО КОМАНДАМ:</span>');
+            addOutputLine('assemble - Компиляция ассемблерного кода');
+            addOutputLine('execute  - Выполнение программы');
+            addOutputLine('debug    - Режим отладки');
+            addOutputLine('reset    - Сброс системы');
+            addOutputLine('find_serb- Ручной поиск Серба');
+            addOutputLine('wun_chun - Активация Вун-Чун');
+        }
+
+        function manualFindSerb() {
+            addOutputLine('<span style="color: #00ffff">🎯 РУЧНОЙ ПОИСК СЕРБА...</span>');
+            setTimeout(() => {
+                updateRegister('SERB', '0xSERB001');
+                addOutputLine('<span style="color: #00ff00">🎯 СЕРБ ОБНАРУЖЕН В СЕТИ!</span>');
+            }, 1000);
+        }
+
+        function activateWunChun() {
+            addOutputLine('<span style="color: #ff6b00">🥋 АКТИВАЦИЯ ВУН-ЧУН...</span>');
+            updateRegister('CHI', '0xFFFFFFFF');
+            addOutputLine('<span style="color: #00ff00">⚡ ЭНЕРГИЯ ЦИ: 1000%</span>');
+            showAlert('🥋 ВУН-ЧУН АКТИВИРОВАН');
+        }
+
+        function addOutputLine(html) {
+            const line = document.createElement('div');
+            line.className = 'output-line';
+            line.innerHTML = html;
+            output.appendChild(line);
+            output.scrollTop = output.scrollHeight;
+        }
+
+        function showAlert(message) {
+            asmAlert.textContent = message;
+            asmAlert.style.display = 'block';
+            setTimeout(() => {
+                asmAlert.style.display = 'none';
+            }, 3000);
+        }
+
+        // Автофокус на ввод
+        setTimeout(() => {
+            commandInput.focus();
+        }, 2500);
+
+        // Добавляем анимацию для регистров
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes register-update {
+                0% { color: #ffff00; transform: scale(1); }
+                50% { color: #ff6b00; transform: scale(1.1); }
+                100% { color: #ffff00; transform: scale(1); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>⚡ ВУН-ЧУН СИМУЛЯТОР ARMA 2 + BACK TO HELL</title>
+    <style>
+        /* === АБСОЛЮТНАЯ АРМА 2 СИМУЛЯЦИЯ === */
+        :root {
+            --arma2-mode: "TACTICAL_ACTIVE";
+            --back-to-hell: "ENGAGED";
+            --steam-integration: "ONLINE";
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: #0a0a0a;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            overflow: hidden;
+            height: 100vh;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(0, 100, 0, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(100, 0, 0, 0.3) 0%, transparent 50%),
+                linear-gradient(45deg, #000 25%, transparent 25%),
+                linear-gradient(-45deg, #000 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, #000 75%),
+                linear-gradient(-45deg, transparent 75%, #000 75%);
+            background-size: 100px 100px;
+            background-position: 0 0, 0 50px, 50px -50px, -50px 0px;
+        }
+
+        /* === ИНТЕРФЕЙС ARMA 2 === */
+        .arma2-interface {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 20, 10, 0.95);
+            border: 3px solid #00aa00;
+            box-shadow: 
+                inset 0 0 100px #00ff00,
+                0 0 100px #00aa00;
+        }
+
+        /* === ТАКТИЧЕСКАЯ КАРТА === */
+        .tactical-map {
+            position: absolute;
+            top: 50px;
+            left: 50px;
+            right: 300px;
+            bottom: 100px;
+            background: 
+                linear-gradient(90deg, #001100 0%, #003300 100%);
+            border: 2px solid #00ff00;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .map-grid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(90deg, transparent 99%, rgba(0, 255, 0, 0.1) 100%),
+                linear-gradient(transparent 99%, rgba(0, 255, 0, 0.1) 100%);
+            background-size: 50px 50px;
+        }
+
+        /* === ЦЕЛИ НА КАРТЕ === */
+        .map-target {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: #ff0000;
+            border: 2px solid #ffff00;
+            border-radius: 50%;
+            animation: target-pulse 2s infinite;
+        }
+
+        @keyframes target-pulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 10px red; }
+            50% { transform: scale(1.2); box-shadow: 0 0 20px yellow; }
+        }
+
+        /* === ПАНЕЛЬ СТРИМА STEAM === */
+        .steam-panel {
+            position: absolute;
+            top: 50px;
+            right: 50px;
+            width: 250px;
+            bottom: 100px;
+            background: rgba(0, 30, 0, 0.9);
+            border: 2px solid #00aaff;
+            border-radius: 10px;
+            padding: 15px;
+        }
+
+        .stream-chat {
+            height: 200px;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid #00aaff;
+            padding: 10px;
+            margin-bottom: 15px;
+            font-size: 0.9em;
+        }
+
+        .viewer-count {
+            color: #00aaff;
+            font-weight: bold;
+            text-align: center;
+            margin: 10px 0;
+        }
+
+        /* === BACK TO HELL ПАНЕЛЬ === */
+        .back-to-hell-panel {
+            position: absolute;
+            bottom: 50px;
+            left: 50px;
+            right: 50px;
+            height: 40px;
+            background: rgba(255, 0, 0, 0.3);
+            border: 2px solid #ff0000;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            animation: hell-pulse 3s infinite;
+        }
+
+        @keyframes hell-pulse {
+            0%, 100% { background: rgba(255, 0, 0, 0.3); }
+            50% { background: rgba(255, 100, 0, 0.5); }
+        }
+
+        /* === ПАНЕЛЬ УПРАВЛЕНИЯ ARMA 2 === */
+        .arma-controls {
+            position: absolute;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+        }
+
+        .arma-button {
+            background: linear-gradient(135deg, #00aa00, #007700);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .arma-button:hover {
+            background: linear-gradient(135deg, #00ff00, #00aa00);
+            transform: translateY(-2px);
+        }
+
+        /* === СИСТЕМНЫЕ СООБЩЕНИЯ === */
+        .system-message {
+            position: fixed;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.9);
+            color: #00ff00;
+            padding: 10px 20px;
+            border: 2px solid #00ff00;
+            border-radius: 5px;
+            display: none;
+            z-index: 1000;
+            animation: message-slide 0.5s ease-out;
+        }
+
+        @keyframes message-slide {
+            from { transform: translateX(-50%) translateY(-100px); opacity: 0; }
+            to { transform: translateX(-50%) translateY(0); opacity: 1; }
+        }
+
+        /* === ВУН-ЧУН ХУД === */
+        .wun-chun-hud {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid #ff6b00;
+            border-radius: 10px;
+            padding: 10px;
+            font-size: 0.9em;
+        }
+
+        .chi-bar {
+            width: 200px;
+            height: 10px;
+            background: #333;
+            border-radius: 5px;
+            margin: 5px 0;
+            overflow: hidden;
+        }
+
+        .chi-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff6b00, #ffd700);
+            border-radius: 5px;
+            transition: width 0.3s ease;
+        }
+
+        /* === АНИМАЦИИ ДВИЖЕНИЯ === */
+        @keyframes scan-sweep {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100vw); }
+        }
+
+        .scan-line {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #00ff00, transparent);
+            animation: scan-sweep 2s linear infinite;
+            display: none;
+        }
+
+        /* === МОДУЛЬ BACK TO HELL === */
+        .hell-portal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, #ff0000, #8b0000, #000);
+            border-radius: 50%;
+            display: none;
+            animation: portal-spin 5s linear infinite;
+            box-shadow: 
+                0 0 100px #ff0000,
+                inset 0 0 50px #000;
+        }
+
+        @keyframes portal-spin {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- СИСТЕМНЫЕ ФЛАГИ -->
+    <input type="checkbox" id="arma2-active" checked>
+    <input type="checkbox" id="back-to-hell-active">
+    <input type="checkbox" id="serb-spotted">
+    <input type="checkbox" id="wun-chun-engaged">
+
+    <!-- ОСНОВНОЙ ИНТЕРФЕЙС ARMA 2 -->
+    <div class="arma2-interface">
+        <!-- ТАКТИЧЕСКАЯ КАРТА -->
+        <div class="tactical-map">
+            <div class="map-grid"></div>
+            <div class="map-target" style="top: 30%; left: 40%;" data-target="serb"></div>
+            <div class="map-target" style="top: 60%; left: 70%;" data-target="backup-1"></div>
+            <div class="map-target" style="top: 20%; left: 20%;" data-target="backup-2"></div>
+        </div>
+
+        <!-- STEAM СТРИМ ПАНЕЛЬ -->
+        <div class="steam-panel">
+            <div class="viewer-count">👥 ЗРИТЕЛЕЙ: 1,847</div>
+            <div class="stream-chat">
+                <div>StreamMaster: Николай в эфире!</div>
+                <div>Viewer123: Где Серб?</div>
+                <div>WunChunFan: Покажи технику!</div>
+                <div>ARMA2Pro: Тактическая карта загружена</div>
+                <div>SerbHunter: Координаты получены</div>
+                <div>ChiMaster: Энергия Ци на максимуме</div>
+                <div>BackToHell: Порталы активны</div>
+                <div>Viewer456: Когда атака?</div>
+                <div>NikolayFan: Ждем приказа!</div>
+            </div>
+            <div style="text-align: center;">
+                <button class="arma-button" onclick="startStream()">🔴 НАЧАТЬ СТРИМ</button>
+                <button class="arma-button" onclick="showWunChun()">🥋 ВУН-ЧУН ДЕМО</button>
+            </div>
+        </div>
+
+        <!-- BACK TO HELL ПАНЕЛЬ -->
+        <div class="back-to-hell-panel">
+            ⚡ BACK TO HELL: АКТИВАЦИЯ АДА - СЕРБ ОБРЕЧЁН
+        </div>
+
+        <!-- ПАНЕЛЬ УПРАВЛЕНИЯ -->
+        <div class="arma-controls">
+            <button class="arma-button" onclick="spotSerb()">🎯 ОБНАРУЖИТЬ СЕРБА</button>
+            <button class="arma-button" onclick="activateWunChun()">⚡ АКТИВИРОВАТЬ ВУН-ЧУН</button>
+            <button class="arma-button" onclick="startBackToHell()">🔥 BACK TO HELL</button>
+            <button class="arma-button" onclick="launchAttack()">💥 НАЧАТЬ АТАКУ</button>
+        </div>
+
+        <!-- ВУН-ЧУН HUD -->
+        <div class="wun-chun-hud">
+            <div>🥋 ВУН-ЧУН СИСТЕМА</div>
+            <div>ЭНЕРГИЯ ЦИ:</div>
+            <div class="chi-bar">
+                <div class="chi-fill" style="width: 100%"></div>
+            </div>
+            <div>⚡ СИЛА: 100%</div>
+        </div>
+
+        <!-- СКАНЕР -->
+        <div class="scan-line" id="scanLine"></div>
+
+        <!-- ПОРТАЛ АДА -->
+        <div class="hell-portal" id="hellPortal"></div>
+    </div>
+
+    <!-- СИСТЕМНЫЕ СООБЩЕНИЯ -->
+    <div class="system-message" id="systemMessage">
+        СИСТЕМА ARMA 2 АКТИВИРОВАНА
+    </div>
+
+    <script>
+        // Показ системных сообщений
+        function showMessage(text) {
+            const message = document.getElementById('systemMessage');
+            message.textContent = text;
+            message.style.display = 'block';
+            setTimeout(() => {
+                message.style.display = 'none';
+            }, 3000);
+        }
+
+        // Обнаружение Серба
+        function spotSerb() {
+            showMessage('🎯 ОБНАРУЖЕНИЕ СЕРБА...');
+            document.getElementById('scanLine').style.display = 'block';
+            
+            setTimeout(() => {
+                document.getElementById('serb-spotted').checked = true;
+                showMessage('🎯 СЕРБ ОБНАРУЖЕН! КООРДИНАТЫ: 55.7558°N, 37.6173°E');
+                
+                // Анимация цели
+                const serbTarget = document.querySelector('[data-target="serb"]');
+                serbTarget.style.animation = 'target-pulse 0.5s infinite';
+                
+                // Обновление чата
+                addChatMessage('Система', 'Серб обнаружен! Приготовиться к атаке!');
+            }, 2000);
+        }
+
+        // Активация Вун-Чун
+        function activateWunChun() {
+            showMessage('🥋 АКТИВАЦИЯ ВУН-ЧУН...');
+            document.getElementById('wun-chun-engaged').checked = true;
+            
+            setTimeout(() => {
+                showMessage('⚡ ВУН-ЧУН АКТИВИРОВАН! ЭНЕРГИЯ ЦИ: 1000%');
+                
+                // Анимация энергии
+                const chiFill = document.querySelector('.chi-fill');
+                chiFill.style.background = 'linear-gradient(90deg, #ff0000, #ff6b00, #ffd700)';
+                chiFill.style.animation = 'chi-pulse 0.5s infinite';
+                
+                addChatMessage('Вун-Чун Система', 'Боевая готовность: МАКСИМУМ');
+            }, 1500);
+        }
+
+        // Back to Hell активация
+        function startBackToHell() {
+            showMessage('🔥 АКТИВАЦИЯ BACK TO HELL...');
+            document.getElementById('back-to-hell-active').checked = true;
+            
+            const portal = document.getElementById('hellPortal');
+            portal.style.display = 'block';
+            
+            setTimeout(() => {
+                showMessage('👹 BACK TO HELL АКТИВИРОВАН! СЕРБ ОБРЕЧЁН НА АД!');
+                
+                // Анимация ада
+                document.body.style.background = 
+                    'radial-gradient(circle at 50% 50%, #ff0000, #8b0000, #000)';
+                
+                addChatMessage('BackToHell', 'Портал ада открыт! Серб будет низвергнут!');
+            }, 2000);
+        }
+
+        // Запуск атаки
+        function launchAttack() {
+            if (!document.getElementById('serb-spotted').checked) {
+                showMessage('❌ СЕРБ НЕ ОБНАРУЖЕН!');
+                return;
+            }
+            
+            if (!document.getElementById('wun-chun-engaged').checked) {
+                showMessage('❌ ВУН-ЧУН НЕ АКТИВИРОВАН!');
+                return;
+            }
+
+            showMessage('💥 ЗАПУСК КОМБИНИРОВАННОЙ АТАКИ...');
+            
+            setTimeout(() => {
+                showMessage('🎯 АТАКА ARMA 2 + ВУН-ЧУН + BACK TO HELL!');
+                
+                // Мега-анимация
+                document.body.style.animation = 'ultimate-attack 0.1s infinite';
+                const style = document.createElement('style');
+                style.textContent = `
+                    @keyframes ultimate-attack {
+                        0% { 
+                            filter: hue-rotate(0deg) brightness(2) saturate(3);
+                            background: radial-gradient(circle, #ff0000, #000);
+                        }
+                        25% { 
+                            filter: hue-rotate(90deg) brightness(3) saturate(4);
+                            background: radial-gradient(circle, #ff6b00, #000);
+                        }
+                        50% { 
+                            filter: hue-rotate(180deg) brightness(4) saturate(5);
+                            background: radial-gradient(circle, #ffff00, #000);
+                        }
+                        75% { 
+                            filter: hue-rotate(270deg) brightness(3) saturate(4);
+                            background: radial-gradient(circle, #00ff00, #000);
+                        }
+                        100% { 
+                            filter: hue-rotate(360deg) brightness(2) saturate(3);
+                            background: radial-gradient(circle, #ff0000, #000);
+                        }
+                    }
+                `;
+                document.head.appendChild(style);
+                
+                addChatMessage('НИКОЛАЙ ДИДЫК', 'СЕРБ ЛИКВИДИРОВАН! МИССИЯ ВЫПОЛНЕНА!');
+                
+                // Финальное сообщение
+                setTimeout(() => {
+                    showMessage('🎉 ПОБЕДА! СЕРБ УНИЧТОЖЕН КОМБИНАЦИЕЙ ARMA 2 + ВУН-ЧУН + BACK TO HELL!');
+                }, 3000);
+            }, 2000);
+        }
+
+        // Запуск стрима
+        function startStream() {
+            showMessage('📡 ЗАПУСК СТРИМА STEAM...');
+            addChatMessage('Система', 'СТРИМ АКТИВИРОВАН! 1,847 зрителей онлайн');
+        }
+
+        // Демонстрация Вун-Чун
+        function showWunChun() {
+            showMessage('🥋 ДЕМОНСТРАЦИЯ ТЕХНИК ВУН-ЧУН...');
+            addChatMessage('Николай Дидык', 'Показываю технику Прямого Удара Цепи!');
+            
+            setTimeout(() => {
+                addChatMessage('Зрители', '👏👏👏 БРАВО! МАСТЕР ВУН-ЧУН!');
+            }, 2000);
+        }
+
+        // Добавление сообщений в чат
+        function addChatMessage(sender, message) {
+            const chat = document.querySelector('.stream-chat');
+            const messageElement = document.createElement('div');
+            messageElement.textContent = `${sender}: ${message}`;
+            chat.appendChild(messageElement);
+            chat.scrollTop = chat.scrollHeight;
+        }
+
+        // Автозапуск системы
+        window.onload = function() {
+            showMessage('🎮 СИСТЕМА ARMA 2 + ВУН-ЧУН + BACK TO HELL АКТИВИРОВАНА');
+            addChatMessage('Система', 'Николай Дидык вошел в систему');
+            addChatMessage('ARMA2 Тактика', 'Тактическая карта загружена');
+            addChatMessage('Вун-Чун Мастер', 'Энергия Ци: 100%');
+        }
+
+        // Анимация энергии Ци
+        setInterval(() => {
+            if (document.getElementById('wun-chun-engaged').checked) {
+                const chiFill = document.querySelector('.chi-fill');
+                const currentWidth = parseInt(chiFill.style.width);
+                chiFill.style.width = '100%';
+            }
+        }, 100);
+    </script>
+</body>
+</html>

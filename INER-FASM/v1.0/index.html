@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+/* Интерпретатор FASM */
+.program { counter-reset: eip; }
+
+.instruction[data-address="0"]:target ~ .cpu #eax { value: 5; }
+.instruction[data-address="0"]:target ~ .cpu #eip { value: 1; }
+
+.instruction[data-address="1"]:target ~ .cpu #eax[value="5"] { value: 8; }
+.instruction[data-address="1"]:target ~ .cpu #eip { value: 2; }
+
+.instruction[data-address="2"]:target ~ .cpu #eax[value="8"] ~ #flags { value: 1; }
+.instruction[data-address="2"]:target ~ .cpu #eip { value: 3; }
+
+.instruction[data-address="3"]:target ~ .cpu #flags[value="1"] ~ #eip { value: 4; }
+
+/* Визуализация состояния */
+.cpu::after {
+    content: "EAX: " attr(data-eax) " | EIP: " attr(data-eip) " | ZF: " attr(data-zf);
+}
+
+/* Кнопка выполнения */
+#step-0:checked ~ .program .instruction[data-address="0"] { display: block; }
+#step-1:checked ~ .program .instruction[data-address="1"] { display: block; }
+#step-2:checked ~ .program .instruction[data-address="2"] { display: block; }
+</style>
+</head>
+<body>
+
+<input type="radio" name="step" id="step-0" checked>
+<input type="radio" name="step" id="step-1">
+<input type="radio" name="step" id="step-2">
+
+<div class="cpu" data-eax="0" data-eip="0" data-zf="0">
+    <!-- Состояние процессора -->
+</div>
+
+<div class="program">
+    <div class="instruction" data-address="0" data-opcode="mov eax, 5">mov eax, 5</div>
+    <div class="instruction" data-address="1" data-opcode="add eax, 3">add eax, 3</div>
+    <div class="instruction" data-address="2" data-opcode="cmp eax, 8">cmp eax, 8</div>
+    <div class="instruction" data-address="3" data-opcode="je exit">je exit</div>
+</div>
+
+<label for="step-0">Step 0</label>
+<label for="step-1">Step 1</label>  
+<label for="step-2">Step 2</label>
+
+</body>
+</html>
